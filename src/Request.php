@@ -1,11 +1,11 @@
 <?php
 
-namespace Rougin\Valdi;
+namespace Rougin\Validia;
 
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * @package Valdi
+ * @package Validia
  *
  * @author Rougin Gutib <rougingutib@gmail.com>
  */

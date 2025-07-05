@@ -1,4 +1,4 @@
-# Valdi
+# Validia
 
 A simple validation package based on [Valitron](https://github.com/vlucas/valitron).
 
@@ -7,7 +7,7 @@ A simple validation package based on [Valitron](https://github.com/vlucas/valitr
 Install the package using [Composer](https://getcomposer.org/):
 
 ``` bash
-$ composer require rougin/valdi
+$ composer require rougin/validia
 ```
 
 ## Basic usage
@@ -15,7 +15,7 @@ $ composer require rougin/valdi
 Create a class that extends to `Check` class:
 
 ``` php
-use Rougin\Valdi\Check;
+use Rougin\Validia\Check;
 
 class UserCheck extends Check
 {
@@ -61,7 +61,7 @@ else
 **NOTE**: Custom conditions for labels and rules is possible using the `labels` and `rules` methods:
 
 ``` php
-use Rougin\Valdi\Check;
+use Rougin\Validia\Check;
 
 class UserCheck extends Check
 {
@@ -86,7 +86,7 @@ class UserCheck extends Check
 If using data from `psr/http-message`, kindly use the `Request` class instead and add aliases under `alias` if necessary:
 
 ``` php
-use Rougin\Valdi\Request;
+use Rougin\Validia\Request;
 
 class UserCheck extends Request
 {
@@ -122,7 +122,7 @@ if ($check->isParsedValid($request))
 When extending from the `Request` class, kindly add the `setAlias` method when overriding the `valid` method to apply the aliases defined in the specified class:
 
 ``` php
-use Rougin\Valdi\Check;
+use Rougin\Validia\Check;
 
 class UserCheck extends Request
 {

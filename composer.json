@@ -1,7 +1,7 @@
 {
-  "name": "rougin/valdi",
+  "name": "rougin/validia",
   "description": "A simple validation package in PHP.",
-  "homepage": "https://github.com/rougin/valdi",
+  "homepage": "https://github.com/rougin/validia",
   "license": "MIT",
   "authors":
   [
@@ -12,7 +12,9 @@
   ],
   "require":
   {
-    "php": ">=5.3.0"
+    "php": ">=5.3.0",
+    "psr/http-message": "~1.0",
+    "vlucas/valitron": "~1.4"
   },
   "require-dev":
   {
@@ -23,14 +25,14 @@
   {
     "psr-4":
     {
-      "Rougin\\Valdi\\": "src"
+      "Rougin\\Validia\\": "src"
     }
   },
   "autoload-dev":
   {
     "psr-4":
     {
-      "Rougin\\Valdi\\": "tests"
+      "Rougin\\Validia\\": "tests"
     }
   },
   "scripts":
