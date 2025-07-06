@@ -12,14 +12,9 @@ use Valitron\Validator;
 class Check
 {
     /**
-     * @var array<string, mixed>
+     * @var array<string, string[]>
      */
     protected $errors = array();
-
-    /**
-     * @var array<mixed, mixed>
-     */
-    protected $data = array();
 
     /**
      * @var array<string, string>
@@ -32,9 +27,9 @@ class Check
     protected $rules = array();
 
     /**
-     * Returns the generated errors after validation.
+     * Returns all errors after validation.
      *
-     * @return array<string, mixed>
+     * @return array<string, string[]>
      */
     public function errors()
     {
@@ -53,7 +48,6 @@ class Check
             return null;
         }
 
-        /** @var string[][] */
         $values = array_values($this->errors);
 
         return $values[0][0];
@@ -72,7 +66,7 @@ class Check
     /**
      * Returns the specified rules based from the payload.
      *
-     * @param array<mixed, mixed> $data
+     * @param array<string, mixed> $data
      *
      * @return array<string, string>
      */
@@ -98,7 +92,6 @@ class Check
             $this->errors[$key] = array();
         }
 
-        /** @var array<string, mixed> */
         $items = $this->errors[$key];
 
         $items[] = $text;
@@ -111,22 +104,15 @@ class Check
     /**
      * Checks if the payload is valid againsts the specified rules.
      *
-     * @param array<mixed, mixed> $data
+     * @param array<string, mixed> $data
      *
      * @return boolean
      */
-    public function valid($data = null)
+    public function valid($data)
     {
         $valid = new Validator;
 
         $valid->labels($this->labels());
-
-        // If no payload received, check the data inside ---
-        if (! $data)
-        {
-            $data = $this->data;
-        }
-        // -------------------------------------------------
 
         $rules = $this->rules($data);
 
@@ -145,13 +131,13 @@ class Check
         }
 
         /** @var array<string, string[]> */
-        $result = $valid->errors();
+        $errors = $valid->errors();
 
-        foreach ($result as $name => $errors)
+        foreach ($errors as $name => $items)
         {
-            foreach ($errors as $error)
+            foreach ($items as $item)
             {
-                $this->setError($name, $error);
+                $this->setError($name, $item);
             }
         }
 

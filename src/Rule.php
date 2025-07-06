@@ -62,7 +62,7 @@ class Rule
 
         $name = trim($details[0]);
 
-        $values = [];
+        $values = array();
 
         // Extract all dependency fields/values ---
         if (count($details) > 1)

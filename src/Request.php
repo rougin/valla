@@ -14,16 +14,16 @@ class Request extends Check
     /**
      * @var array<string, string>
      */
-    protected $alias = array();
+    protected $aliases = array();
 
     /**
-     * Returns the aliases defined.
+     * Returns the defined aliases.
      *
      * @return array<string, string>
      */
-    public function alias()
+    public function aliases()
     {
-        return $this->alias;
+        return $this->aliases;
     }
 
     /**
@@ -36,9 +36,9 @@ class Request extends Check
     public function isParamsValid(ServerRequestInterface $request)
     {
         /** @var array<string, string> */
-        $params = $request->getQueryParams();
+        $data = $request->getQueryParams();
 
-        return $this->valid($params);
+        return $this->valid($this->setAlias($data));
     }
 
     /**
@@ -50,52 +50,39 @@ class Request extends Check
      */
     public function isParsedValid(ServerRequestInterface $request)
     {
-        /** @var array<string, string> */
-        $parsed = $request->getParsedBody();
+        /** @var array<string, mixed> */
+        $data = $request->getParsedBody();
 
-        return $this->valid($parsed);
-    }
-
-    /**
-     * Checks if the payload is valid againsts the specified rules.
-     *
-     * @param array<mixed, mixed>|null $data
-     *
-     * @return boolean
-     */
-    public function valid($data = null)
-    {
-        return parent::valid($this->setAlias($data));
+        return $this->valid($this->setAlias($data));
     }
 
     /**
      * Sets the alias for the payload.
      *
-     * @param array<mixed, mixed>|null $data
+     * @param array<string, mixed> $data
      *
      * @return array<string, mixed>
      */
-    protected function setAlias($data = null)
+    protected function setAlias($data)
     {
-        $aliases = $this->alias();
+        $aliases = $this->aliases();
 
         $items = array();
 
-        if ($data === null)
-        {
-            $data = $this->data;
-        }
-
         foreach ($data as $key => $value)
         {
-            if (! isset($aliases[$key]))
+            $exists = array_key_exists($key, $aliases);
+
+            if (! $exists)
             {
                 $items[$key] = $value;
 
                 continue;
             }
 
-            $items[$aliases[$key]] = $value;
+            $alias = $aliases[$key];
+
+            $items[$alias] = $value;
         }
 
         return $items;
