@@ -85,18 +85,12 @@ class Check
      */
     public function setError($key, $text)
     {
-        $exists = array_key_exists($key, $this->errors);
-
-        if (! $exists)
+        if (! isset($this->errors[$key]))
         {
             $this->errors[$key] = array();
         }
 
-        $items = $this->errors[$key];
-
-        $items[] = $text;
-
-        $this->errors[$key] = $items;
+        $this->errors[$key][] = $text;
 
         return $this;
     }
