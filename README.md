@@ -12,13 +12,16 @@ $ composer require rougin/validia
 
 ## Basic usage
 
-Create a class that extends to `Check` class:
+The core of `Validia` is the `Check` class. To create a set of validation rules, create a PHP class that extends to `Check`:
 
 ``` php
 use Rougin\Validia\Check;
 
 class UserCheck extends Check
 {
+    /**
+     * @var array<string, string>
+     */
     protected $labels =
     [
         'age' => 'Age',
@@ -26,6 +29,9 @@ class UserCheck extends Check
         'name' => 'Name',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $rules =
     [
         'age' => 'required|numeric',
@@ -35,118 +41,191 @@ class UserCheck extends Check
 }
 ```
 
-Once created, submit the data to the said class for validation:
-
-``` php
-$check = new UserCheck;
-
-$data = /* e.g., data from request */;
-
-if ($check->valid($data))
-{
-    // $data passed from validation
-}
-else
-{
-    // Get the available errors ---
-    $errors = $check->errors();
-    // ----------------------------
-
-    // Or get the first error only ---
-    echo $check->firstError();
-    // -------------------------------
-}
-```
-
-**NOTE**: Custom conditions for labels and rules is possible using the `labels` and `rules` methods:
+The `$labels` property defines user-friendly names for the fields, which will be used in error messages:
 
 ``` php
 use Rougin\Validia\Check;
 
 class UserCheck extends Check
 {
+    /**
+     * @var array<string, string>
+     */
+    protected $labels =
+    [
+        'age' => 'Age',
+        'email' => 'Email',
+        'name' => 'Name',
+    ];
+
+    // ...
+}
+```
+
+While the `$rules` property specifies the validation rules for each field:
+
+``` php
+use Rougin\Validia\Check;
+
+class UserCheck extends Check
+{
+    // ...
+
+    /**
+     * @var array<string, string>
+     */
+    protected $rules =
+    [
+        'age' => 'required|numeric',
+        'email' => 'required|email',
+        'name' => 'required',
+    ];
+}
+```
+
+> [!NOTE]
+> A list of available rules can be found in the [Valitron documentation](https://github.com/vlucas/valitron#validation-rules).
+
+Once the `Check` class is created, it can be used to validate an array of data, such as data from a HTTP request:
+
+``` php
+$check = new UserCheck;
+
+$data = /* e.g., data from a request */;
+
+if (! $check->valid($data))
+{
+    // Get all available errors
+    $errors = $check->errors();
+
+    // Or get only the first error
+    echo $check->firstError();
+
+    return;
+}
+
+// Data has passed validation
+```
+
+## Dynamic labels, rules
+
+For more complex scenarios, the `labels` and `rules` methods can be overridden to define labels and rules dynamically:
+
+``` php
+use Rougin\Validia\Check;
+
+class UserCheck extends Check
+{
+    /**
+     * Returns the specified labels.
+     *
+     * @return array<string, string>
+     */
     public function labels()
     {
-        // Add conditions to custom labels here ---
-        // ----------------------------------------
+        $this->labels['is_company'] = 'Is a Company?';
 
         return $this->labels;
     }
 
+    /**
+     * Returns the specified rules based on the data.
+     *
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, string>
+     */
     public function rules($data)
     {
-        // Add conditions to custom rules here ---
-        // ---------------------------------------
+        if (array_key_exists('is_company', $data))
+        {
+            $this->rules['company_name'] = 'required';
+        }
 
         return $this->rules;
     }
 }
 ```
 
-If using data from `psr/http-message`, kindly use the `Request` class instead and add aliases under `alias` if necessary:
+## Working with PSR-7 requests
+
+For applications using `ServerRequestInterface` of [PSR-7](https://www.php-fig.org/psr/psr-7/), the `Request` class provides a convenient way to validate request data:
 
 ``` php
 use Rougin\Validia\Request;
 
 class UserCheck extends Request
 {
-    protected $alias =
+    /**
+     * @var array<string, string>
+     */
+    protected $aliases =
     [
-        'name' => 'username',
-        'email' => 'email_add',
-        'age' => 'new_age',
+        'username' => 'name',
+        'email_add' => 'email',
+        'new_age' => 'age',
     ];
+
+    // ...
 }
 ```
+
+The `Request` class provides two methods for validation: `isParamsValid` for validating query parameters and `isParsedValid` for validating the parsed body:
 
 ``` php
 $check = new UserCheck;
 
-// Should return ServerRequestInterface ---
+// Should return the ServerRequestInterface ---
 $request = Http::getServerRequest();
-// ----------------------------------------
+// --------------------------------------------
 
 // Checks against data from "getQueryParams" ---
 if ($check->isParamsValid($request))
 {
+    // Query parameters are valid
 }
 // ---------------------------------------------
 
 // Checks against data from "getParsedBody" ---
 if ($check->isParsedValid($request))
 {
+    // Parsed body is valid
 }
 // --------------------------------------------
 ```
 
-When extending from the `Request` class, kindly add the `setAlias` method when overriding the `valid` method to apply the aliases defined in the specified class:
+When an alias is specified, it will be used to look for the field in the `ServerRequestInterface` data. For example, if the request data contains a `username` field, it will be validated against the rules defined for the `name` field.
+
+## Overriding the `valid` method
+
+When extending the `Request` class and overriding the `valid` method, the `setAlias` method must be called to apply the defined aliases.
 
 ``` php
-use Rougin\Validia\Check;
+use Rougin\Validia\Request;
 
 class UserCheck extends Request
 {
     // ...
 
-    public function valid($data = null)
+    public function valid($data)
     {
-        // Always include if has aliases defined ---
+        // Always include this if aliases are defined ---
         $data = $this->setAlias($data);
-        // -----------------------------------------
+        // ----------------------------------------------
 
         $valid = parent::valid($data);
 
-        if (! $valid) return $valid;
+        if (! $valid)
+        {
+            return count($this->errors) === 0;
+        }
 
-        // Add extra conditions here ---
-        // -----------------------------
+        // Add extra custom validation conditions here
 
         return count($this->errors) === 0;
     }
 }
 ```
-
-**NOTE**: If an alias is specified, the aliases will be used in searching for the said fields from `ServerRequestInterface`.
 
 ## Change log
 

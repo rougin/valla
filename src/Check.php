@@ -64,7 +64,7 @@ class Check
     }
 
     /**
-     * Returns the specified rules based from the payload.
+     * Returns the specified rules based on payload.
      *
      * @param array<string, mixed> $data
      *
