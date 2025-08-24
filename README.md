@@ -149,7 +149,7 @@ class UserCheck extends Check
 
 ## Working with PSR-7 requests
 
-For applications using `ServerRequestInterface` of [PSR-7](https://www.php-fig.org/psr/psr-7/), the `Request` class provides a convenient way to validate request data:
+If using `ServerRequestInterface` of [PSR-7](https://www.php-fig.org/psr/psr-7/), the `Request` class provides a convenient way to validate request data:
 
 ``` php
 use Rougin\Validia\Request;
