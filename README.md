@@ -1,4 +1,4 @@
-# Validia
+# Valla
 
 A simple validation package based on [Valitron](https://github.com/vlucas/valitron).
 
@@ -7,15 +7,15 @@ A simple validation package based on [Valitron](https://github.com/vlucas/valitr
 Install the package using [Composer](https://getcomposer.org/):
 
 ``` bash
-$ composer require rougin/validia
+$ composer require rougin/valla
 ```
 
 ## Basic usage
 
-The core of `Validia` is the `Check` class. To create a set of validation rules, create a PHP class that extends to `Check`:
+The core of `Valla` is the `Check` class which is used to create a set of validation rules:
 
 ``` php
-use Rougin\Validia\Check;
+use Rougin\Valla\Check;
 
 class UserCheck extends Check
 {
@@ -44,7 +44,7 @@ class UserCheck extends Check
 The `$labels` property defines user-friendly names for the fields, which will be used in error messages:
 
 ``` php
-use Rougin\Validia\Check;
+use Rougin\Valla\Check;
 
 class UserCheck extends Check
 {
@@ -65,7 +65,7 @@ class UserCheck extends Check
 While the `$rules` property specifies the validation rules for each field:
 
 ``` php
-use Rougin\Validia\Check;
+use Rougin\Valla\Check;
 
 class UserCheck extends Check
 {
@@ -112,7 +112,7 @@ if (! $check->valid($data))
 For more complex scenarios, the `labels` and `rules` methods can be overridden to define labels and rules dynamically:
 
 ``` php
-use Rougin\Validia\Check;
+use Rougin\Valla\Check;
 
 class UserCheck extends Check
 {
@@ -152,7 +152,7 @@ class UserCheck extends Check
 If using `ServerRequestInterface` of [PSR-7](https://www.php-fig.org/psr/psr-7/), the `Request` class provides a convenient way to validate request data:
 
 ``` php
-use Rougin\Validia\Request;
+use Rougin\Valla\Request;
 
 class UserCheck extends Request
 {
@@ -201,7 +201,7 @@ When an alias is specified, it will be used to look for the field in the `Server
 When extending the `Request` class and overriding the `valid` method, the `setAlias` method must be called to apply the defined aliases.
 
 ``` php
-use Rougin\Validia\Request;
+use Rougin\Valla\Request;
 
 class UserCheck extends Request
 {

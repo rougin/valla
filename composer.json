@@ -1,7 +1,7 @@
 {
-  "name": "rougin/validia",
+  "name": "rougin/valla",
   "description": "A simple validation package in PHP.",
-  "homepage": "https://github.com/rougin/validia",
+  "homepage": "https://github.com/rougin/valla",
   "license": "MIT",
   "authors":
   [
@@ -25,14 +25,14 @@
   {
     "psr-4":
     {
-      "Rougin\\Validia\\": "src"
+      "Rougin\\Valla\\": "src"
     }
   },
   "autoload-dev":
   {
     "psr-4":
     {
-      "Rougin\\Validia\\": "tests"
+      "Rougin\\Valla\\": "tests"
     }
   },
   "scripts":
