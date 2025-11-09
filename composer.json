@@ -19,7 +19,8 @@
   "require-dev":
   {
     "phpunit/phpunit": "*",
-    "sanmai/phpunit-legacy-adapter": "*"
+    "sanmai/phpunit-legacy-adapter": "*",
+    "rougin/slytherin": "~0.9"
   },
   "autoload":
   {

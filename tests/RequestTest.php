@@ -2,6 +2,7 @@
 
 namespace Rougin\Valla;
 
+use Rougin\Slytherin\Http\ServerRequest;
 use Rougin\Valla\Fixture\RequestCheck;
 
 /**
@@ -82,15 +83,23 @@ class RequestTest extends Testcase
      */
     protected function newHttp($data, $parsed = false)
     {
-        $class = 'Psr\Http\Message\ServerRequestInterface';
+        $load = array('SERVER_PORT' => '80');
 
-        $http = $this->createMock($class);
+        $load['REQUEST_METHOD'] = 'GET';
+        $load['REQUEST_URI'] = '/';
+        $load['SERVER_NAME'] = 'localhost';
 
-        $method = $parsed ? 'getParsedBody' : 'getQueryParams';
+        $http = new ServerRequest($load);
 
-        $http->method($method)->willReturn($data);
+        if ($parsed)
+        {
+            $http = $http->withParsedBody($data);
+        }
+        else
+        {
+            $http = $http->withQueryParams($data);
+        }
 
-        /** @var \Psr\Http\Message\ServerRequestInterface */
         return $http;
     }
 }
