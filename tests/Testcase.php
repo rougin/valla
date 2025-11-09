@@ -5,7 +5,7 @@ namespace Rougin\Valla;
 use LegacyPHPUnit\TestCase as Legacy;
 
 /**
- * @package Torin
+ * @package Valla
  *
  * @author Rougin Gutib <rougingutib@gmail.com>
  */
