@@ -74,33 +74,23 @@ class Rule
         }
         // ----------------------------------------
 
+        $onlyOne = count($values) === 1;
+
+        /** @var string */
+        $value = end($values);
+
+        $strict = trim($value) === 'true';
+
         if ($name === 'contains')
         {
-            /** @var string */
-            $value = end($values);
-
-            if (trim($value) === 'true')
-            {
-                $this->valid->rule($name, $field, $values, true);
-
-                return;
-            }
-
-            $this->valid->rule($name, $field, $values);
+            $this->valid->rule($name, $field, $values, $strict);
 
             return;
         }
 
         if ($name === 'creditCard')
         {
-            if (count($values) === 1)
-            {
-                $value = trim($values[0]);
-
-                $this->valid->rule($name, $field, $value);
-
-                return;
-            }
+            $values = $onlyOne ? trim($values[0]) : $values;
 
             $this->valid->rule($name, $field, $values);
 
@@ -136,38 +126,19 @@ class Rule
 
         if ($name === 'required')
         {
-            if (count($values) && trim(end($values)) === 'true')
-            {
-                $this->valid->rule($name, $field, true);
-
-                return;
-            }
+            $this->valid->rule($name, $field, $strict);
         }
 
         if ($name === 'requiredWith')
         {
-            if (count($values) && trim(end($values)) === 'true')
-            {
-                $this->valid->rule($name, $field, $values, true);
-
-                return;
-            }
-
-            $this->valid->rule($name, $field, $values);
+            $this->valid->rule($name, $field, $values, $strict);
 
             return;
         }
 
         if ($name === 'requiredWithout')
         {
-            if (count($values) && trim(end($values)) === 'true')
-            {
-                $this->valid->rule($name, $field, $values, true);
-
-                return;
-            }
-
-            $this->valid->rule($name, $field, $values);
+            $this->valid->rule($name, $field, $values, $strict);
 
             return;
         }
@@ -186,11 +157,13 @@ class Rule
         }
         // -----------------------------------
 
-        // Rule with only 1 value/field ----------------------------
-        if ((count($values) === 1) && trim(end($values)) !== 'true')
+        // Rule with only 1 value/field --------------
+        if ($onlyOne && trim(end($values)) !== 'true')
         {
-            $this->valid->rule($name, $field, trim($values[0]));
+            $value = trim($values[0]);
+
+            $this->valid->rule($name, $field, $value);
         }
-        // ---------------------------------------------------------
+        // -------------------------------------------
     }
 }
