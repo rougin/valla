@@ -233,13 +233,13 @@ class UserCheck extends Request
 }
 ```
 
-## Change log
+## Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more recent changes.
+Please see [CHANGELOG][link-changelog] for more recent changes.
 
 ## Contributing
 
-See [CONTRIBUTING](CONTRIBUTING.md) on how to contribute.
+See [CONTRIBUTING][link-contributing] on how to contribute to the project.
 
 ## License
 
@@ -254,7 +254,6 @@ The MIT License (MIT). Please see [LICENSE][link-license] for more information.
 [link-build]: https://github.com/rougin/valla/actions
 [link-changelog]: https://github.com/rougin/valla/blob/master/CHANGELOG.md
 [link-contributing]: https://github.com/rougin/valla/blob/master/CONTRIBUTING.md
-[link-contributors]: https://github.com/rougin/valla/contributors
 [link-coverage]: https://app.codecov.io/gh/rougin/valla
 [link-downloads]: https://packagist.org/packages/rougin/valla
 [link-license]: https://github.com/rougin/valla/blob/master/LICENSE.md
