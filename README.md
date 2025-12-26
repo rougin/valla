@@ -113,9 +113,9 @@ if (! $check->valid($data))
 // Data has passed validation
 ```
 
-## Dynamic labels, rules
+## Labels, rules
 
-For more complex scenarios, the `labels` and `rules` methods can be overridden to define labels and rules dynamically:
+For more complex scenarios, the `labels` and `rules` methods can be overridden to define them dynamically:
 
 ``` php
 use Rougin\Valla\Check;
@@ -153,9 +153,9 @@ class UserCheck extends Check
 }
 ```
 
-## Working with PSR-7 requests
+## Using PSR-7 requests
 
-If using `ServerRequestInterface` of [PSR-7](https://www.php-fig.org/psr/psr-7/), the `Request` class provides a convenient way to validate request data:
+If using `ServerRequestInterface` from [PSR-7](https://www.php-fig.org/psr/psr-7/), the `Request` class provides a convenient way to validate request data:
 
 ``` php
 use Rougin\Valla\Request;
@@ -204,7 +204,7 @@ When an alias is specified, it will be used to look for the field in the `Server
 
 ## Overriding the `valid` method
 
-When extending the `Request` class and overriding the `valid` method, the `setAlias` method must be called to apply the defined aliases.
+When extending the `Request` class and overriding the `valid` method, the `setAlias` method must be called to apply the defined aliases:
 
 ``` php
 use Rougin\Valla\Request;
