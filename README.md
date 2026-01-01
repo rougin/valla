@@ -8,6 +8,23 @@
 
 A simple validation package based on [Valitron](https://github.com/vlucas/valitron).
 
+``` php
+use Rougin\Valla\Check;
+
+class UserCheck extends Check
+{
+    protected $labels = array(
+        'name' => 'Name',
+        'email' => 'Email',
+    );
+
+    protected $rules = array(
+        'name' => 'required',
+        'email' => 'required|email',
+    );
+}
+```
+
 ## Installation
 
 Install the package using [Composer](https://getcomposer.org/):
