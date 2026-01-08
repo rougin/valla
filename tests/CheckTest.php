@@ -41,13 +41,13 @@ class CheckTest extends Testcase
     public function test_dynamic_rules()
     {
         // Arrange
+        $check = new DynamicCheck;
+
         $data = array('is_company' => true);
 
         $data['company_name'] = '';
 
         // Act
-        $check = new DynamicCheck;
-
         $check->valid($data);
 
         $errors = $check->errors();
@@ -63,14 +63,14 @@ class CheckTest extends Testcase
     /**
      * @return void
      */
-    public function test_errors_population()
+    public function test_errors()
     {
         // Arrange
         $data = array('email' => 'not-an-email');
 
-        // Act
         $check = new SampleCheck;
 
+        // Act
         $check->valid($data);
 
         $errors = $check->errors();
@@ -114,6 +114,8 @@ class CheckTest extends Testcase
     public function test_invalid_data()
     {
         // Arrange
+        $check = new SampleCheck;
+
         $data = array('name' => '');
 
         $data['email'] = 'not-an-email';
@@ -121,12 +123,10 @@ class CheckTest extends Testcase
         $data['age'] = 'not-numeric';
 
         // Act
-        $check = new SampleCheck;
-
-        $result = $check->valid($data);
+        $actual = $check->valid($data);
 
         // Assert
-        $this->assertFalse($result);
+        $this->assertFalse($actual);
     }
 
     /**
@@ -135,6 +135,8 @@ class CheckTest extends Testcase
     public function test_no_errors()
     {
         // Arrange
+        $check = new SampleCheck;
+
         $data = array('name' => 'John Doe');
 
         $data['email'] = 'johndoe@gmail.com';
@@ -142,8 +144,6 @@ class CheckTest extends Testcase
         $data['age'] = 20;
 
         // Act
-        $check = new SampleCheck;
-
         $check->valid($data);
 
         $actual = $check->firstError();
@@ -158,6 +158,8 @@ class CheckTest extends Testcase
     public function test_valid_data()
     {
         // Arrange
+        $check = new SampleCheck;
+
         $data = array('name' => 'John Doe');
 
         $data['email'] = 'johndoe@gmail.com';
@@ -165,11 +167,9 @@ class CheckTest extends Testcase
         $data['age'] = 20;
 
         // Act
-        $check = new SampleCheck;
-
-        $result = $check->valid($data);
+        $actual = $check->valid($data);
 
         // Assert
-        $this->assertTrue($result);
+        $this->assertTrue($actual);
     }
 }
