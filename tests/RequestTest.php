@@ -93,13 +93,9 @@ class RequestTest extends Testcase
 
         if ($parsed)
         {
-            $http = $http->withParsedBody($data);
-        }
-        else
-        {
-            $http = $http->withQueryParams($data);
+            return $http->withParsedBody($data);
         }
 
-        return $http;
+        return $http->withQueryParams($data);
     }
 }
