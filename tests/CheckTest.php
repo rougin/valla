@@ -22,14 +22,14 @@ class CheckTest extends Testcase
 
         $check->setError('custom', 'This is a custom error.');
 
+        $expect = 'This is a custom error.';
+
         // Act
         $check->valid(array());
 
         $errors = $check->errors();
 
         // Assert
-        $expect = 'This is a custom error.';
-
         $actual = $errors['custom'][0];
 
         $this->assertEquals($expect, $actual);
@@ -41,6 +41,8 @@ class CheckTest extends Testcase
     public function test_dynamic_rules()
     {
         // Arrange
+        $expect = 'Company Name is required';
+
         $check = new DynamicCheck;
 
         $data = array('is_company' => true);
@@ -53,8 +55,6 @@ class CheckTest extends Testcase
         $errors = $check->errors();
 
         // Assert
-        $expect = 'Company Name is required';
-
         $actual = $errors['company_name'][0];
 
         $this->assertEquals($expect, $actual);
@@ -70,14 +70,14 @@ class CheckTest extends Testcase
 
         $check = new SampleCheck;
 
+        $expect = 'Email is not a valid email address';
+
         // Act
         $check->valid($data);
 
         $errors = $check->errors();
 
         // Assert
-        $expect = 'Email is not a valid email address';
-
         $actual = $errors['email'][0];
 
         $this->assertEquals($expect, $actual);
@@ -89,13 +89,15 @@ class CheckTest extends Testcase
     public function test_first_error()
     {
         // Arrange
-        $check = new SampleCheck;
-
         $data = array('name' => '');
 
         $data['email'] = 'johndoe@gmail.com';
 
         $data['age'] = 20;
+
+        $expect = 'Name is required';
+
+        $check = new SampleCheck;
 
         // Act
         $check->valid($data);
@@ -103,8 +105,6 @@ class CheckTest extends Testcase
         $actual = $check->firstError();
 
         // Assert
-        $expect = 'Name is required';
-
         $this->assertEquals($expect, $actual);
     }
 
