@@ -17,12 +17,12 @@ class Check
     /**
      * @var array<string, string>
      */
-    protected $labels = array();
+    protected $rules = array();
 
     /**
      * @var array<string, string>
      */
-    protected $rules = array();
+    protected $labels = array();
 
     /**
      * Returns all errors after validation.
@@ -102,38 +102,29 @@ class Check
      */
     public function valid($data)
     {
-        $labels = $this->labels();
-
         $valid = new Valid;
 
-        $valid->withLabels($labels);
+        $valid->setLabels($this->labels());
 
+        // Initialize the defined rules --------
         $rules = $this->rules($data);
 
         foreach ($rules as $key => $value)
         {
             $rule = new Rule($valid);
 
-            $valid = $rule->parse($key, $value);
+            $valid = $rule->match($key, $value);
         }
+        // -------------------------------------
 
-        $valid = $valid->withData($data);
+        $valid = $valid->setData($data);
 
-        if ($valid->check())
+        if ($valid->isOkay())
         {
             return count($this->errors) === 0;
         }
 
-        /** @var array<string, string[]> */
-        $errors = $valid->errors();
-
-        foreach ($errors as $name => $items)
-        {
-            foreach ($items as $item)
-            {
-                $this->setError($name, $item);
-            }
-        }
+        $this->errors = $valid->getErrors();
 
         return count($this->errors) === 0;
     }

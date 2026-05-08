@@ -37,14 +37,14 @@ class Rule
     }
 
     /**
-     * Parses the specified rule against its value.
+     * Matches the specified rule against its value.
      *
-     * @param string $rule
+     * @param string $field
      * @param string $value
      *
      * @return \Rougin\Valla\Valid
      */
-    public function parse($rule, $value)
+    public function match($field, $value)
     {
         // Break down multiple rules ---
         $items = explode('|', $value);
@@ -52,9 +52,11 @@ class Rule
 
         foreach ($items as $item)
         {
-            // Parse each rule --------
-            $this->check($item, $rule);
-            // ------------------------
+            // Attach each specified rule -------
+            $rule = $this->check($item);
+
+            $this->valid->addRule($rule, $field);
+            // ----------------------------------
         }
 
         return $this->valid;
@@ -64,11 +66,10 @@ class Rule
      * Checks the specified rules.
      *
      * @param string $item
-     * @param string $field
      *
-     * @return void
+     * @return \Rougin\Valla\RuleInterface
      */
-    protected function check($item, $field)
+    protected function check($item)
     {
         $texts = explode(':', $item);
 
@@ -78,39 +79,33 @@ class Rule
 
         $values = array();
 
-        // Extract all dependency fields/values ---
+        // Extract all dependency fields/values ----
         if (count($texts) > 1)
         {
-            $texts[1] = trim($texts[1]);
-
-            $values = explode(',', $texts[1]);
+            $values = explode(',', trim($texts[1]));
 
             $value = $values[count($values) - 1];
         }
-        // ----------------------------------------
-
-        $strict = trim($value) === 'true';
-
-        $rule = null;
+        // -----------------------------------------
 
         if ($name === Contains::getName())
         {
-            $rule = new Contains($values[0]);
+            return new Contains($values[0]);
         }
 
         if ($name === CreditCard::getName())
         {
-            $rule = new CreditCard;
+            return new CreditCard;
         }
 
         if ($name === Email::getName())
         {
-            $rule = new Email;
+            return new Email;
         }
 
         if ($name === In::getName())
         {
-            $rule = new In($values);
+            return new In($values);
         }
 
         if ($name === IsInstance::getName())
@@ -121,56 +116,53 @@ class Rule
             $value = new $class;
             // -------------------------------------------------
 
-            $rule = new IsInstance($value);
+            return new IsInstance($value);
         }
 
         if ($name === LengthMax::getName())
         {
-            $rule = new LengthMax((int) $values[0]);
+            return new LengthMax((int) $values[0]);
         }
 
         if ($name === LengthMin::getName())
         {
-            $rule = new LengthMin((int) $values[0]);
+            return new LengthMin((int) $values[0]);
         }
 
         if ($name === NotIn::getName())
         {
-            $rule = new NotIn($values);
+            return new NotIn($values);
         }
 
         if ($name === Numeric::getName())
         {
-            $rule = new Numeric;
+            return new Numeric;
         }
+
+        $strict = trim($value) === 'true';
 
         if ($name === Required::getName())
         {
-            $rule = new Required($strict);
+            return new Required($strict);
         }
 
         if ($name === RequiredWith::getName())
         {
-            $rule = new RequiredWith($values, $strict);
+            return new RequiredWith($values, $strict);
         }
 
         if ($name === RequiredWithout::getName())
         {
-            $rule = new RequiredWithout($values, $strict);
+            return new RequiredWithout($values, $strict);
         }
 
         if ($name === Subset::getName())
         {
-            $rule = new Subset($values);
+            return new Subset($values);
         }
 
-        if ($rule === null)
-        {
-            $error = 'Rule "' . $name . '" not found';
+        $error = 'Rule "' . $name . '" not found';
 
-            throw new \Exception($error);
-        }
-
-        $this->valid->add($rule, $field);
+        throw new \Exception($error);
     }
 }

@@ -20,12 +20,17 @@ class Valid
     protected $data = array();
 
     /**
+     * @var string[]
+     */
+    protected $fields = array();
+
+    /**
      * @var array<string, string>
      */
     protected $labels = array();
 
     /**
-     * @var array<int, array<string, mixed>>
+     * @var \Rougin\Valla\RuleInterface[]
      */
     protected $rules = array();
 
@@ -38,57 +43,62 @@ class Valid
     }
 
     /**
-     * @param RuleInterface $rule
-     * @param mixed         $fields
+     * @param \Rougin\Valla\RuleInterface $rule
+     * @param string                      $field
      *
      * @return self
      */
-    public function add(RuleInterface $rule, $fields)
+    public function addRule(RuleInterface $rule, $field)
     {
-        foreach ((array) $fields as $field)
-        {
-            if (is_scalar($field) || (is_object($field) && method_exists($field, '__toString')))
-            {
-                $this->rules[] = array(
-                    'rule' => $rule,
-                    'field' => (string) $field,
-                );
-            }
-        }
+        $this->rules[] = $rule;
+
+        $this->fields[] = $field;
 
         return $this;
     }
 
     /**
-     * @return boolean
+     * @return array<string, string[]>
      */
-    public function check()
+    public function getErrors()
     {
-        foreach ($this->rules as $item)
-        {
-            /** @var RuleInterface */
-            $rule = $item['rule'];
-
-            /** @var string */
-            $field = $item['field'];
-
-            $value = isset($this->data[$field]) ? $this->data[$field] : null;
-
-            if (! $rule->pass($value, $this->data))
-            {
-                $this->setError($field, $rule);
-            }
-        }
-
-        return count($this->errors) === 0;
+        return $this->errors;
     }
 
     /**
-     * @return array<string, string[]>
+     * @return boolean
      */
-    public function errors()
+    public function isOkay()
     {
-        return $this->errors;
+        foreach ($this->rules as $index => $item)
+        {
+            $field = $this->fields[$index];
+
+            $value = null;
+
+            if (array_key_exists($field, $this->data))
+            {
+                $value = $this->data[$field];
+            }
+
+            if ($item->pass($value, $this->data))
+            {
+                continue;
+            }
+
+            $label = ucfirst($field);
+
+            if (array_key_exists($field, $this->labels))
+            {
+                $label = $this->labels[$field];
+            }
+
+            $error = $label . ' ' . $item->getError();
+
+            $this->errors[$field][] = $error;
+        }
+
+        return count($this->errors) === 0;
     }
 
     /**
@@ -96,7 +106,7 @@ class Valid
      *
      * @return self
      */
-    public function withData($data)
+    public function setData($data)
     {
         $this->data = $data;
 
@@ -108,25 +118,10 @@ class Valid
      *
      * @return self
      */
-    public function withLabels($labels)
+    public function setLabels($labels)
     {
         $this->labels = $labels;
 
         return $this;
-    }
-
-    /**
-     * @param string        $field
-     * @param RuleInterface $rule
-     *
-     * @return void
-     */
-    protected function setError($field, RuleInterface $rule)
-    {
-        $label = isset($this->labels[$field]) ? $this->labels[$field] : ucfirst($field);
-
-        $message = $rule->getError();
-
-        $this->errors[$field][] = $label . ' ' . $message;
     }
 }

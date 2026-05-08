@@ -20,9 +20,9 @@ class RuleTest extends Testcase
         $rule = new Rule(new Valid($data));
 
         // Act
-        $check = $rule->parse('name', 'contains:Doe');
+        $valid = $rule->match('name', 'contains:Doe');
 
-        $actual = $check->check();
+        $actual = $valid->isOkay();
 
         // Assert
         $this->assertFalse($actual);
@@ -39,9 +39,9 @@ class RuleTest extends Testcase
         $rule = new Rule(new Valid($data));
 
         // Act
-        $check = $rule->parse('card', 'creditCard');
+        $valid = $rule->match('card', 'creditCard');
 
-        $actual = $check->check();
+        $actual = $valid->isOkay();
 
         // Assert
         $this->assertFalse($actual);
@@ -60,9 +60,9 @@ class RuleTest extends Testcase
         // Act
         $class = 'Rougin\Valla\Fixture\DummyClass';
 
-        $check = $rule->parse('obj', 'instanceOf:' . $class);
+        $valid = $rule->match('obj', 'instanceOf:' . $class);
 
-        $actual = $check->check();
+        $actual = $valid->isOkay();
 
         // Assert
         $this->assertFalse($actual);
@@ -79,9 +79,9 @@ class RuleTest extends Testcase
         $rule = new Rule(new Valid($data));
 
         // Act
-        $check = $rule->parse('password_confirmation', 'requiredWith:password');
+        $valid = $rule->match('password_confirmation', 'requiredWith:password');
 
-        $actual = $check->check();
+        $actual = $valid->isOkay();
 
         // Assert
         $this->assertFalse($actual);
@@ -98,12 +98,11 @@ class RuleTest extends Testcase
         $rule = new Rule(new Valid($data));
 
         // Act
-        $check = $rule->parse('email', 'required|email');
+        $valid = $rule->match('email', 'required|email');
 
-        $actual = $check->check();
+        $actual = $valid->isOkay();
 
-        /** @var array<string, string[]> */
-        $errors = $check->errors();
+        $errors = $valid->getErrors();
 
         // Assert
         $expect = 'Email is not a valid email address';
@@ -124,9 +123,9 @@ class RuleTest extends Testcase
         $rule = new Rule(new Valid($data));
 
         // Act
-        $check = $rule->parse('role', 'notIn:admin,editor');
+        $valid = $rule->match('role', 'notIn:admin,editor');
 
-        $actual = $check->check();
+        $actual = $valid->isOkay();
 
         // Assert
         $this->assertFalse($actual);
@@ -143,8 +142,8 @@ class RuleTest extends Testcase
         $rule = new Rule(new Valid($data));
 
         // Act
-        $check = $rule->parse('email', 'requiredWithout:name');
-        $actual = $check->check();
+        $valid = $rule->match('email', 'requiredWithout:name');
+        $actual = $valid->isOkay();
 
         // Assert
         $this->assertFalse($actual);
@@ -161,9 +160,9 @@ class RuleTest extends Testcase
         $rule = new Rule(new Valid($data));
 
         // Act
-        $check = $rule->parse('name', 'lengthMin:5');
+        $valid = $rule->match('name', 'lengthMin:5');
 
-        $actual = $check->check();
+        $actual = $valid->isOkay();
 
         // Assert
         $this->assertFalse($actual);
@@ -180,9 +179,9 @@ class RuleTest extends Testcase
         $rule = new Rule(new Valid($data));
 
         // Act
-        $check = $rule->parse('name', 'required');
+        $valid = $rule->match('name', 'required');
 
-        $actual = $check->check();
+        $actual = $valid->isOkay();
 
         // Assert
         $this->assertFalse($actual);
@@ -199,9 +198,9 @@ class RuleTest extends Testcase
         $rule = new Rule(new Valid($data));
 
         // Act
-        $check = $rule->parse('role', 'in:admin,editor');
+        $valid = $rule->match('role', 'in:admin,editor');
 
-        $actual = $check->check();
+        $actual = $valid->isOkay();
 
         // Assert
         $this->assertFalse($actual);
@@ -218,9 +217,9 @@ class RuleTest extends Testcase
         $rule = new Rule(new Valid($data));
 
         // Act
-        $check = $rule->parse('options', 'subset:a,b,c');
+        $valid = $rule->match('options', 'subset:a,b,c');
 
-        $actual = $check->check();
+        $actual = $valid->isOkay();
 
         // Assert
         $this->assertFalse($actual);

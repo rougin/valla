@@ -6,7 +6,7 @@
 [![Coverage Status][ico-coverage]][link-coverage]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-A simple validation package inspired by [Valitron](https://github.com/vlucas/valitron).
+A simple validation package for PHP inspired by [Valitron](https://github.com/vlucas/valitron).
 
 ``` php
 use Rougin\Valla\Check;
@@ -14,13 +14,17 @@ use Rougin\Valla\Check;
 class UserCheck extends Check
 {
     protected $labels = array(
+
         'name' => 'Name',
         'email' => 'Email',
+
     );
 
     protected $rules = array(
+
         'name' => 'required',
         'email' => 'required|email',
+
     );
 }
 ```
@@ -45,22 +49,24 @@ class UserCheck extends Check
     /**
      * @var array<string, string>
      */
-    protected $labels =
-    [
+    protected $labels = array(
+
         'age' => 'Age',
         'email' => 'Email',
         'name' => 'Name',
-    ];
+
+    );
 
     /**
      * @var array<string, string>
      */
-    protected $rules =
-    [
+    protected $rules = array(
+
         'age' => 'required|numeric',
         'email' => 'required|email',
         'name' => 'required',
-    ];
+
+    );
 }
 ```
 
@@ -74,12 +80,13 @@ class UserCheck extends Check
     /**
      * @var array<string, string>
      */
-    protected $labels =
-    [
+    protected $labels = array(
+
         'age' => 'Age',
         'email' => 'Email',
         'name' => 'Name',
-    ];
+
+    );
 
     // ...
 }
@@ -97,12 +104,13 @@ class UserCheck extends Check
     /**
      * @var array<string, string>
      */
-    protected $rules =
-    [
+    protected $rules = array(
+
         'age' => 'required|numeric',
         'email' => 'required|email',
         'name' => 'required',
-    ];
+
+    );
 }
 ```
 
@@ -182,12 +190,13 @@ class UserCheck extends Request
     /**
      * @var array<string, string>
      */
-    protected $aliases =
-    [
+    protected $aliases = array(
+
         'username' => 'name',
         'email_add' => 'email',
         'new_age' => 'age',
-    ];
+
+    );
 
     // ...
 }
@@ -236,9 +245,7 @@ class UserCheck extends Request
         $data = $this->setAlias($data);
         // ----------------------------------------------
 
-        $valid = parent::valid($data);
-
-        if (! $valid)
+        if (! parent::valid($data))
         {
             return count($this->errors) === 0;
         }
