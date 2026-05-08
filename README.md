@@ -6,7 +6,7 @@
 [![Coverage Status][ico-coverage]][link-coverage]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-A simple validation package based on [Valitron](https://github.com/vlucas/valitron).
+A simple validation package inspired by [Valitron](https://github.com/vlucas/valitron).
 
 ``` php
 use Rougin\Valla\Check;

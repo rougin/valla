@@ -76,8 +76,8 @@ class RequestTest extends Testcase
     }
 
     /**
-     * @param array<string, mixed> $data
-     * @param boolean              $parsed
+     * @param array<string, string> $data
+     * @param boolean               $parsed
      *
      * @return \Psr\Http\Message\ServerRequestInterface
      */

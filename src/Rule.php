@@ -2,8 +2,6 @@
 
 namespace Rougin\Valla;
 
-use Valitron\Validator;
-
 /**
  * @package Valla
  *
@@ -12,14 +10,14 @@ use Valitron\Validator;
 class Rule
 {
     /**
-     * @var \Valitron\Validator
+     * @var \Rougin\Valla\Valid
      */
     protected $valid;
 
     /**
-     * @param \Valitron\Validator $valid
+     * @param \Rougin\Valla\Valid $valid
      */
-    public function __construct(Validator $valid)
+    public function __construct(Valid $valid)
     {
         $this->valid = $valid;
     }
@@ -30,7 +28,7 @@ class Rule
      * @param string $rule
      * @param string $value
      *
-     * @return \Valitron\Validator
+     * @return \Rougin\Valla\Valid
      */
     public function parse($rule, $value)
     {
@@ -83,7 +81,7 @@ class Rule
 
         if ($name === 'contains')
         {
-            $this->valid->rule($name, $field, $values, $strict);
+            $this->valid->add($name, $field, $values, $strict);
 
             return;
         }
@@ -92,14 +90,14 @@ class Rule
         {
             $values = $onlyOne ? trim($values[0]) : $values;
 
-            $this->valid->rule($name, $field, $values);
+            $this->valid->add($name, $field, $values);
 
             return;
         }
 
         if ($name === 'in')
         {
-            $this->valid->rule($name, $field, $values);
+            $this->valid->add($name, $field, $values);
 
             return;
         }
@@ -112,40 +110,40 @@ class Rule
             $value = new $value;
             // -------------------------------------------------
 
-            $this->valid->rule($name, $field, $value);
+            $this->valid->add($name, $field, $value);
 
             return;
         }
 
         if ($name === 'notIn')
         {
-            $this->valid->rule($name, $field, $values);
+            $this->valid->add($name, $field, $values);
 
             return;
         }
 
         if ($name === 'required')
         {
-            $this->valid->rule($name, $field, $strict);
+            $this->valid->add($name, $field, $strict);
         }
 
         if ($name === 'requiredWith')
         {
-            $this->valid->rule($name, $field, $values, $strict);
+            $this->valid->add($name, $field, $values, $strict);
 
             return;
         }
 
         if ($name === 'requiredWithout')
         {
-            $this->valid->rule($name, $field, $values, $strict);
+            $this->valid->add($name, $field, $values, $strict);
 
             return;
         }
 
         if ($name === 'subset')
         {
-            $this->valid->rule($name, $field, $values);
+            $this->valid->add($name, $field, $values);
 
             return;
         }
@@ -153,7 +151,7 @@ class Rule
         // Rule without fields/values --------
         if (count($values) === 0)
         {
-            $this->valid->rule($name, $field);
+            $this->valid->add($name, $field);
         }
         // -----------------------------------
 
@@ -162,7 +160,7 @@ class Rule
         {
             $value = trim($values[0]);
 
-            $this->valid->rule($name, $field, $value);
+            $this->valid->add($name, $field, $value);
         }
         // -------------------------------------------
     }

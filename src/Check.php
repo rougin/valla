@@ -2,8 +2,6 @@
 
 namespace Rougin\Valla;
 
-use Valitron\Validator;
-
 /**
  * @package Valla
  *
@@ -104,7 +102,7 @@ class Check
      */
     public function valid($data)
     {
-        $valid = new Validator;
+        $valid = new Valid;
 
         $valid->labels($this->labels());
 
@@ -119,7 +117,7 @@ class Check
 
         $valid = $valid->withData($data);
 
-        if ($valid->validate())
+        if ($valid->check())
         {
             return count($this->errors) === 0;
         }
