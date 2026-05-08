@@ -2,34 +2,67 @@
 
 namespace Rougin\Valla\Rules;
 
+use Rougin\Valla\RuleInterface;
+
 /**
  * @package Valla
  *
  * @author Rougin Gutib <rougingutib@gmail.com>
  */
-class RequiredWith implements Rule
+class RequiredWith implements RuleInterface
 {
+    /**
+     * @var string[]
+     */
+    protected $fields;
+
+    /**
+     * @var boolean
+     */
+    protected $strict;
+
+    /**
+     * @param string[] $fields
+     * @param boolean  $strict
+     */
+    public function __construct(array $fields, $strict = false)
+    {
+        $this->fields = $fields;
+
+        $this->strict = $strict;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getName()
+    {
+        return 'requiredWith';
+    }
+
+    /**
+     * @return string
+     */
+    public function getError()
+    {
+        return 'is required';
+    }
+
     /**
      * Checks if the specified value passes the rule.
      *
      * @param mixed                $value
-     * @param mixed[]              $params
      * @param array<string, mixed> $data
      *
      * @return boolean
      */
-    public function pass($value, $params = array(), $data = array())
+    public function pass($value, $data = array())
     {
-        if (! isset($params[0]))
-        {
-            return true;
-        }
-
         $required = false;
 
-        foreach ((array) $params[0] as $item)
+        foreach ($this->fields as $item)
         {
-            if (is_scalar($item) && isset($data[(string) $item]) && ! empty($data[(string) $item]))
+            if (isset($data[(string) $item]) && ! empty($data[(string) $item]))
             {
                 $required = true;
 
@@ -39,9 +72,9 @@ class RequiredWith implements Rule
 
         if ($required)
         {
-            $rule = new Required;
+            $rule = new Required($this->strict);
 
-            return $rule->pass($value, array(), $data);
+            return $rule->pass($value, $data);
         }
 
         return true;

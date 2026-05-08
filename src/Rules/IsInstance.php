@@ -2,29 +2,59 @@
 
 namespace Rougin\Valla\Rules;
 
+use Rougin\Valla\RuleInterface;
+
 /**
  * @package Valla
  *
  * @author Rougin Gutib <rougingutib@gmail.com>
  */
-class IsInstance implements Rule
+class IsInstance implements RuleInterface
 {
+    /**
+     * @var string
+     */
+    protected $class;
+
+    /**
+     * @param object|string $class
+     */
+    public function __construct($class)
+    {
+        $this->class = is_object($class) ? get_class($class) : $class;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getName()
+    {
+        return 'instanceOf';
+    }
+
+    /**
+     * @return string
+     */
+    public function getError()
+    {
+        return sprintf('must be an instance of \'%s\'', $this->class);
+    }
+
     /**
      * Checks if the specified value passes the rule.
      *
      * @param mixed                $value
-     * @param mixed[]              $params
      * @param array<string, mixed> $data
      *
      * @return boolean
      */
-    public function pass($value, $params = array(), $data = array())
+    public function pass($value, $data = array())
     {
-        if (! is_object($value) || ! isset($params[0]))
+        if (! is_object($value))
         {
             return false;
         }
 
-        return $value instanceof $params[0];
+        return $value instanceof $this->class;
     }
 }

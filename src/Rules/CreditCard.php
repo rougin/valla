@@ -2,23 +2,40 @@
 
 namespace Rougin\Valla\Rules;
 
+use Rougin\Valla\RuleInterface;
+
 /**
  * @package Valla
  *
  * @author Rougin Gutib <rougingutib@gmail.com>
  */
-class CreditCard implements Rule
+class CreditCard implements RuleInterface
 {
+    /**
+     * @return string
+     */
+    public static function getName()
+    {
+        return 'creditCard';
+    }
+
+    /**
+     * @return string
+     */
+    public function getError()
+    {
+        return 'must be a valid credit card number';
+    }
+
     /**
      * Checks if the specified value passes the rule.
      *
      * @param mixed                $value
-     * @param mixed[]              $params
      * @param array<string, mixed> $data
      *
      * @return boolean
      */
-    public function pass($value, $params = array(), $data = array())
+    public function pass($value, $data = array())
     {
         if (! is_string($value) && ! is_numeric($value))
         {
@@ -34,10 +51,12 @@ class CreditCard implements Rule
         }
 
         $sum = 0;
-        $numDigits = strlen($value);
-        $parity = $numDigits % 2;
 
-        for ($i = 0; $i < $numDigits; $i++)
+        $length = strlen($value);
+
+        $parity = $length % 2;
+
+        for ($i = 0; $i < $length; $i++)
         {
             $digit = (int) $value[$i];
 

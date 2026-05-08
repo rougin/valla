@@ -102,9 +102,11 @@ class Check
      */
     public function valid($data)
     {
+        $labels = $this->labels();
+
         $valid = new Valid;
 
-        $valid->labels($this->labels());
+        $valid->withLabels($labels);
 
         $rules = $this->rules($data);
 

@@ -1,31 +1,27 @@
 <?php
 
-namespace Rougin\Valla\Rules;
-
-use Rougin\Valla\RuleInterface;
+namespace Rougin\Valla;
 
 /**
  * @package Valla
  *
  * @author Rougin Gutib <rougingutib@gmail.com>
  */
-class Numeric implements RuleInterface
+interface RuleInterface
 {
     /**
+     * Returns the name of the rule.
+     *
      * @return string
      */
-    public static function getName()
-    {
-        return 'numeric';
-    }
+    public static function getName();
 
     /**
+     * Returns the error message template.
+     *
      * @return string
      */
-    public function getError()
-    {
-        return 'must be numeric';
-    }
+    public function getError();
 
     /**
      * Checks if the specified value passes the rule.
@@ -35,8 +31,5 @@ class Numeric implements RuleInterface
      *
      * @return boolean
      */
-    public function pass($value, $data = array())
-    {
-        return is_numeric($value);
-    }
+    public function pass($value, $data = array());
 }

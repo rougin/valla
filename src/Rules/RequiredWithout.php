@@ -9,18 +9,26 @@ use Rougin\Valla\RuleInterface;
  *
  * @author Rougin Gutib <rougingutib@gmail.com>
  */
-class Required implements RuleInterface
+class RequiredWithout implements RuleInterface
 {
+    /**
+     * @var string[]
+     */
+    protected $fields;
+
     /**
      * @var boolean
      */
     protected $strict;
 
     /**
-     * @param boolean $strict
+     * @param string[] $fields
+     * @param boolean  $strict
      */
-    public function __construct($strict = false)
+    public function __construct(array $fields, $strict = false)
     {
+        $this->fields = $fields;
+
         $this->strict = $strict;
     }
 
@@ -29,7 +37,7 @@ class Required implements RuleInterface
      */
     public static function getName()
     {
-        return 'required';
+        return 'requiredWithout';
     }
 
     /**
@@ -50,11 +58,25 @@ class Required implements RuleInterface
      */
     public function pass($value, $data = array())
     {
-        if ($this->strict)
+        $required = false;
+
+        foreach ($this->fields as $item)
         {
-            return ! is_null($value);
+            if (! isset($data[(string) $item]) || empty($data[(string) $item]))
+            {
+                $required = true;
+
+                break;
+            }
         }
 
-        return ! is_null($value) && (is_string($value) ? trim($value) !== '' : true);
+        if ($required)
+        {
+            $rule = new Required($this->strict);
+
+            return $rule->pass($value, $data);
+        }
+
+        return true;
     }
 }

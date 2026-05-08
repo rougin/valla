@@ -2,6 +2,20 @@
 
 namespace Rougin\Valla;
 
+use Rougin\Valla\Rules\Contains;
+use Rougin\Valla\Rules\CreditCard;
+use Rougin\Valla\Rules\Email;
+use Rougin\Valla\Rules\In;
+use Rougin\Valla\Rules\IsInstance;
+use Rougin\Valla\Rules\LengthMax;
+use Rougin\Valla\Rules\LengthMin;
+use Rougin\Valla\Rules\NotIn;
+use Rougin\Valla\Rules\Numeric;
+use Rougin\Valla\Rules\Required;
+use Rougin\Valla\Rules\RequiredWith;
+use Rougin\Valla\Rules\RequiredWithout;
+use Rougin\Valla\Rules\Subset;
+
 /**
  * @package Valla
  *
@@ -56,112 +70,107 @@ class Rule
      */
     protected function check($item, $field)
     {
-        $details = explode(':', $item);
+        $texts = explode(':', $item);
 
-        $name = trim($details[0]);
+        $name = trim($texts[0]);
+
+        $value = '';
 
         $values = array();
 
         // Extract all dependency fields/values ---
-        if (count($details) > 1)
+        if (count($texts) > 1)
         {
-            $details[1] = trim($details[1]);
+            $texts[1] = trim($texts[1]);
 
-            /** @var string[] */
-            $values = explode(',', $details[1]);
+            $values = explode(',', $texts[1]);
+
+            $value = $values[count($values) - 1];
         }
         // ----------------------------------------
 
-        $onlyOne = count($values) === 1;
-
-        /** @var string */
-        $value = end($values);
-
         $strict = trim($value) === 'true';
 
-        if ($name === 'contains')
-        {
-            $this->valid->add($name, $field, $values, $strict);
+        $rule = null;
 
-            return;
+        if ($name === Contains::getName())
+        {
+            $rule = new Contains($values[0]);
         }
 
-        if ($name === 'creditCard')
+        if ($name === CreditCard::getName())
         {
-            $values = $onlyOne ? trim($values[0]) : $values;
-
-            $this->valid->add($name, $field, $values);
-
-            return;
+            $rule = new CreditCard;
         }
 
-        if ($name === 'in')
+        if ($name === Email::getName())
         {
-            $this->valid->add($name, $field, $values);
-
-            return;
+            $rule = new Email;
         }
 
-        if ($name === 'instanceOf')
+        if ($name === In::getName())
         {
-            $value = trim($values[0]);
+            $rule = new In($values);
+        }
+
+        if ($name === IsInstance::getName())
+        {
+            $class = trim($values[0]);
 
             // TODO: Setup ContainerInterface for autowiring ---
-            $value = new $value;
+            $value = new $class;
             // -------------------------------------------------
 
-            $this->valid->add($name, $field, $value);
-
-            return;
+            $rule = new IsInstance($value);
         }
 
-        if ($name === 'notIn')
+        if ($name === LengthMax::getName())
         {
-            $this->valid->add($name, $field, $values);
-
-            return;
+            $rule = new LengthMax((int) $values[0]);
         }
 
-        if ($name === 'required')
+        if ($name === LengthMin::getName())
         {
-            $this->valid->add($name, $field, $strict);
+            $rule = new LengthMin((int) $values[0]);
         }
 
-        if ($name === 'requiredWith')
+        if ($name === NotIn::getName())
         {
-            $this->valid->add($name, $field, $values, $strict);
-
-            return;
+            $rule = new NotIn($values);
         }
 
-        if ($name === 'requiredWithout')
+        if ($name === Numeric::getName())
         {
-            $this->valid->add($name, $field, $values, $strict);
-
-            return;
+            $rule = new Numeric;
         }
 
-        if ($name === 'subset')
+        if ($name === Required::getName())
         {
-            $this->valid->add($name, $field, $values);
-
-            return;
+            $rule = new Required($strict);
         }
 
-        // Rule without fields/values --------
-        if (count($values) === 0)
+        if ($name === RequiredWith::getName())
         {
-            $this->valid->add($name, $field);
+            $rule = new RequiredWith($values, $strict);
         }
-        // -----------------------------------
 
-        // Rule with only 1 value/field --------------
-        if ($onlyOne && trim(end($values)) !== 'true')
+        if ($name === RequiredWithout::getName())
         {
-            $value = trim($values[0]);
-
-            $this->valid->add($name, $field, $value);
+            $rule = new RequiredWithout($values, $strict);
         }
-        // -------------------------------------------
+
+        if ($name === Subset::getName())
+        {
+            $rule = new Subset($values);
+        }
+
+        if ($rule === null)
+        {
+            $error = 'Rule "' . $name . '" not found';
+
+            throw new \Exception($error);
+        }
+
+        $this->valid->add($rule, $field);
     }
 }
