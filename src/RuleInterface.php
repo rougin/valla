@@ -31,5 +31,5 @@ interface RuleInterface
      *
      * @return boolean
      */
-    public function pass($value, $data = array());
+    public function passed($value, $data);
 }

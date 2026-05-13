@@ -12,6 +12,8 @@ use Rougin\Valla\RuleInterface;
 class Email implements RuleInterface
 {
     /**
+     * Returns the name of the rule.
+     *
      * @return string
      */
     public static function getName()
@@ -20,6 +22,8 @@ class Email implements RuleInterface
     }
 
     /**
+     * Returns the error message template.
+     *
      * @return string
      */
     public function getError()
@@ -35,7 +39,7 @@ class Email implements RuleInterface
      *
      * @return boolean
      */
-    public function pass($value, $data = array())
+    public function passed($value, $data)
     {
         if (! is_string($value))
         {

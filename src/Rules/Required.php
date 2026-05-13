@@ -17,14 +17,8 @@ class Required implements RuleInterface
     protected $strict;
 
     /**
-     * @param boolean $strict
-     */
-    public function __construct($strict = false)
-    {
-        $this->strict = $strict;
-    }
-
-    /**
+     * Returns the name of the rule.
+     *
      * @return string
      */
     public static function getName()
@@ -33,6 +27,16 @@ class Required implements RuleInterface
     }
 
     /**
+     * @param boolean $strict
+     */
+    public function __construct($strict = false)
+    {
+        $this->strict = $strict;
+    }
+
+    /**
+     * Returns the error message template.
+     *
      * @return string
      */
     public function getError()
@@ -48,7 +52,7 @@ class Required implements RuleInterface
      *
      * @return boolean
      */
-    public function pass($value, $data = array())
+    public function passed($value, $data)
     {
         if ($this->strict)
         {

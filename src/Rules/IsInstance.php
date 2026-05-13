@@ -17,14 +17,8 @@ class IsInstance implements RuleInterface
     protected $class;
 
     /**
-     * @param object|string $class
-     */
-    public function __construct($class)
-    {
-        $this->class = is_object($class) ? get_class($class) : $class;
-    }
-
-    /**
+     * Returns the name of the rule.
+     *
      * @return string
      */
     public static function getName()
@@ -33,6 +27,16 @@ class IsInstance implements RuleInterface
     }
 
     /**
+     * @param object|string $class
+     */
+    public function __construct($class)
+    {
+        $this->class = is_object($class) ? get_class($class) : $class;
+    }
+
+    /**
+     * Returns the error message template.
+     *
      * @return string
      */
     public function getError()
@@ -48,7 +52,7 @@ class IsInstance implements RuleInterface
      *
      * @return boolean
      */
-    public function pass($value, $data = array())
+    public function passed($value, $data)
     {
         if (! is_object($value))
         {

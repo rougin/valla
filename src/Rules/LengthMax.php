@@ -17,14 +17,8 @@ class LengthMax implements RuleInterface
     protected $max;
 
     /**
-     * @param integer $max
-     */
-    public function __construct($max)
-    {
-        $this->max = (int) $max;
-    }
-
-    /**
+     * Returns the name of the rule.
+     *
      * @return string
      */
     public static function getName()
@@ -33,6 +27,16 @@ class LengthMax implements RuleInterface
     }
 
     /**
+     * @param integer $max
+     */
+    public function __construct($max)
+    {
+        $this->max = (int) $max;
+    }
+
+    /**
+     * Returns the error message template.
+     *
      * @return string
      */
     public function getError()
@@ -48,7 +52,7 @@ class LengthMax implements RuleInterface
      *
      * @return boolean
      */
-    public function pass($value, $data = array())
+    public function passed($value, $data)
     {
         if (! is_string($value))
         {

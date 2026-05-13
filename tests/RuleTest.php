@@ -22,7 +22,7 @@ class RuleTest extends Testcase
         // Act
         $valid = $rule->match('name', 'contains:Doe');
 
-        $actual = $valid->isOkay();
+        $actual = $valid->passed();
 
         // Assert
         $this->assertFalse($actual);
@@ -41,7 +41,7 @@ class RuleTest extends Testcase
         // Act
         $valid = $rule->match('card', 'creditCard');
 
-        $actual = $valid->isOkay();
+        $actual = $valid->passed();
 
         // Assert
         $this->assertFalse($actual);
@@ -62,7 +62,7 @@ class RuleTest extends Testcase
 
         $valid = $rule->match('obj', 'instanceOf:' . $class);
 
-        $actual = $valid->isOkay();
+        $actual = $valid->passed();
 
         // Assert
         $this->assertFalse($actual);
@@ -81,7 +81,7 @@ class RuleTest extends Testcase
         // Act
         $valid = $rule->match('password_confirmation', 'requiredWith:password');
 
-        $actual = $valid->isOkay();
+        $actual = $valid->passed();
 
         // Assert
         $this->assertFalse($actual);
@@ -100,7 +100,7 @@ class RuleTest extends Testcase
         // Act
         $valid = $rule->match('email', 'required|email');
 
-        $actual = $valid->isOkay();
+        $actual = $valid->passed();
 
         $errors = $valid->getErrors();
 
@@ -125,7 +125,7 @@ class RuleTest extends Testcase
         // Act
         $valid = $rule->match('role', 'notIn:admin,editor');
 
-        $actual = $valid->isOkay();
+        $actual = $valid->passed();
 
         // Assert
         $this->assertFalse($actual);
@@ -143,7 +143,7 @@ class RuleTest extends Testcase
 
         // Act
         $valid = $rule->match('email', 'requiredWithout:name');
-        $actual = $valid->isOkay();
+        $actual = $valid->passed();
 
         // Assert
         $this->assertFalse($actual);
@@ -162,7 +162,7 @@ class RuleTest extends Testcase
         // Act
         $valid = $rule->match('name', 'lengthMin:5');
 
-        $actual = $valid->isOkay();
+        $actual = $valid->passed();
 
         // Assert
         $this->assertFalse($actual);
@@ -181,7 +181,7 @@ class RuleTest extends Testcase
         // Act
         $valid = $rule->match('name', 'required');
 
-        $actual = $valid->isOkay();
+        $actual = $valid->passed();
 
         // Assert
         $this->assertFalse($actual);
@@ -200,7 +200,7 @@ class RuleTest extends Testcase
         // Act
         $valid = $rule->match('role', 'in:admin,editor');
 
-        $actual = $valid->isOkay();
+        $actual = $valid->passed();
 
         // Assert
         $this->assertFalse($actual);
@@ -219,7 +219,7 @@ class RuleTest extends Testcase
         // Act
         $valid = $rule->match('options', 'subset:a,b,c');
 
-        $actual = $valid->isOkay();
+        $actual = $valid->passed();
 
         // Assert
         $this->assertFalse($actual);

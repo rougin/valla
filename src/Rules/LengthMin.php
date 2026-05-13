@@ -17,14 +17,8 @@ class LengthMin implements RuleInterface
     protected $min;
 
     /**
-     * @param integer $min
-     */
-    public function __construct($min)
-    {
-        $this->min = (int) $min;
-    }
-
-    /**
+     * Returns the name of the rule.
+     *
      * @return string
      */
     public static function getName()
@@ -33,6 +27,16 @@ class LengthMin implements RuleInterface
     }
 
     /**
+     * @param integer $min
+     */
+    public function __construct($min)
+    {
+        $this->min = (int) $min;
+    }
+
+    /**
+     * Returns the error message template.
+     *
      * @return string
      */
     public function getError()
@@ -48,7 +52,7 @@ class LengthMin implements RuleInterface
      *
      * @return boolean
      */
-    public function pass($value, $data = array())
+    public function passed($value, $data)
     {
         if (! is_string($value))
         {

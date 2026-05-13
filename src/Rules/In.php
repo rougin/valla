@@ -17,14 +17,8 @@ class In implements RuleInterface
     protected $haystack;
 
     /**
-     * @param mixed[] $haystack
-     */
-    public function __construct(array $haystack)
-    {
-        $this->haystack = $haystack;
-    }
-
-    /**
+     * Returns the name of the rule.
+     *
      * @return string
      */
     public static function getName()
@@ -33,6 +27,16 @@ class In implements RuleInterface
     }
 
     /**
+     * @param mixed[] $haystack
+     */
+    public function __construct(array $haystack)
+    {
+        $this->haystack = $haystack;
+    }
+
+    /**
+     * Returns the error message template.
+     *
      * @return string
      */
     public function getError()
@@ -48,7 +52,7 @@ class In implements RuleInterface
      *
      * @return boolean
      */
-    public function pass($value, $data = array())
+    public function passed($value, $data)
     {
         return in_array($value, $this->haystack);
     }

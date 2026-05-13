@@ -39,7 +39,7 @@ class Valid
      */
     public function __construct($data = array())
     {
-        $this->data = $data;
+        $this->setData($data);
     }
 
     /**
@@ -68,7 +68,7 @@ class Valid
     /**
      * @return boolean
      */
-    public function isOkay()
+    public function passed()
     {
         foreach ($this->rules as $index => $item)
         {
@@ -81,7 +81,7 @@ class Valid
                 $value = $this->data[$field];
             }
 
-            if ($item->pass($value, $this->data))
+            if ($item->passed($value, $this->data))
             {
                 continue;
             }

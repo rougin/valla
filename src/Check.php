@@ -94,7 +94,7 @@ class Check
     }
 
     /**
-     * Checks if the payload is valid againsts the specified rules.
+     * Checks if the payload is valid against defined rules.
      *
      * @param array<string, mixed> $data
      *
@@ -102,7 +102,7 @@ class Check
      */
     public function valid($data)
     {
-        $valid = new Valid;
+        $valid = new Valid($data);
 
         $valid->setLabels($this->labels());
 
@@ -117,9 +117,7 @@ class Check
         }
         // -------------------------------------
 
-        $valid = $valid->setData($data);
-
-        if ($valid->isOkay())
+        if ($valid->passed())
         {
             return count($this->errors) === 0;
         }
