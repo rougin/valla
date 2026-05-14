@@ -178,6 +178,273 @@ class UserCheck extends Check
 }
 ```
 
+
+## Built-in rules
+
+Valla ships with 13 built-in rules, each pre-loaded in the default `Ruleset`:
+
+### contains
+
+Checks that the value contains the given substring with non-string values fail automatically:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('name' => 'Jane');
+
+$valid = new Valid($data);
+
+$valid->addRule('name', 'contains:Doe');
+
+// Returns "Name must contain Doe" ---
+if (! $valid->passed())
+{
+    echo $valid->firstError();
+}
+// -----------------------------------
+```
+
+### creditCard
+
+Validates a credit card number using the Luhn algorithm with dashes and spaces stripped before checking:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('card' => '123456789');
+
+$valid = new Valid($data);
+
+$valid->addRule('card', 'creditCard');
+
+if (! $valid->passed())
+{
+    // "Card must be a valid credit card number"
+    echo $valid->firstError();
+}
+```
+
+### email
+
+Validates a properly formatted email address with non-string values fail automatically:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('email' => 'not-an-email');
+
+$valid = new Valid($data);
+
+$valid->addRule('email', 'email');
+
+if (! $valid->passed())
+{
+    // "Email is not a valid email address"
+    echo $valid->firstError();
+}
+```
+
+### in
+
+Checks that the value matches one of the listed values:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('role' => 'guest');
+
+$valid = new Valid($data);
+
+$valid->addRule('role', 'in:admin,editor');
+
+if (! $valid->passed())
+{
+    // "Role contains invalid value"
+    echo $valid->firstError();
+}
+```
+
+### instanceOf
+
+Validates that the value is an instance of the given class with non-object values fail automatically:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('obj' => new \stdClass);
+
+$valid = new Valid($data);
+
+$valid->addRule('obj', 'instanceOf:\DateTime');
+
+if (! $valid->passed())
+{
+    // "Obj must be an instance of 'DateTime'"
+    echo $valid->firstError();
+}
+```
+
+### lengthMax
+
+Checks that the value does not exceed the given character length with non-string values fail automatically:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('name' => 'too long');
+
+$valid = new Valid($data);
+
+$valid->addRule('name', 'lengthMax:5');
+
+if (! $valid->passed())
+{
+    // "Name must not exceed 5 characters"
+    echo $valid->firstError();
+}
+```
+
+### lengthMin
+
+Checks that the value meets the given minimum character length with non-string values fail automatically:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('name' => 'Jo');
+
+$valid = new Valid($data);
+
+$valid->addRule('name', 'lengthMin:5');
+
+if (! $valid->passed())
+{
+    // "Name must be at least 5 characters long"
+    echo $valid->firstError();
+}
+```
+
+### notIn
+
+Checks that the value does not match any of the listed values:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('role' => 'admin');
+
+$valid = new Valid($data);
+
+$valid->addRule('role', 'notIn:admin,editor');
+
+if (! $valid->passed())
+{
+    // "Role contains invalid value"
+    echo $valid->firstError();
+}
+```
+
+### numeric
+
+Checks that the value is numeric:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('age' => 'abc');
+
+$valid = new Valid($data);
+
+$valid->addRule('age', 'numeric');
+
+if (! $valid->passed())
+{
+    // "Age must be numeric"
+    echo $valid->firstError();
+}
+```
+
+### required
+
+Ensures the field is present and not empty with an optional strict mode rejecting only null:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('name' => '');
+
+$valid = new Valid($data);
+
+$valid->addRule('name', 'required');
+
+// Returns "Name is required" ---
+if (! $valid->passed())
+{
+    echo $valid->firstError();
+}
+// --------------------------------
+```
+
+### requiredWith
+
+Makes the field required when at least one of the listed fields is present and non-empty:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('company_name' => '', 'is_company' => 'yes');
+
+$valid = new Valid($data);
+
+$valid->addRule('company_name', 'requiredWith:is_company');
+
+if (! $valid->passed())
+{
+    // "Company_name is required"
+    echo $valid->firstError();
+}
+```
+
+### requiredWithout
+
+Makes the field required when at least one of the listed fields is absent or empty:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('phone' => '');
+
+$valid = new Valid($data);
+
+$valid->addRule('phone', 'requiredWithout:email');
+
+if (! $valid->passed())
+{
+    // "Phone is required"
+    echo $valid->firstError();
+}
+```
+
+### subset
+
+Checks that every item in the array belongs to the listed set with non-array values fail automatically:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('options' => array('a', 'd'));
+
+$valid = new Valid($data);
+
+$valid->addRule('options', 'subset:a,b,c');
+
+if (! $valid->passed())
+{
+    // "Options contains an item that is not in the list"
+    echo $valid->firstError();
+}
+```
+
 ## Adding custom rules
 
 Custom rules can be added by implementing to `RuleInterface`:
@@ -201,7 +468,7 @@ class Uppercase implements RuleInterface
         return 'uppercase';
     }
 
-    public function passed($value, $data)
+    public function passed($value, array $data)
     {
         return strtoupper($value) === $value;
     }
@@ -213,11 +480,11 @@ class Uppercase implements RuleInterface
 }
 ```
 
-To register the custom rule, add it to a `Ruleset` class then set it to the `Check` class:
+To register the custom rule, add it to a `Ruleset` class then set it to the `Valid` class:
 
 ``` php
 use Rougin\Test\Rules\Uppercase;
-use Rougin\Valla\Check;
+use Rougin\Valla\Valid;
 use Rougin\Valla\Ruleset;
 
 // Register the custom rule ---
@@ -227,199 +494,21 @@ $rules->addRule(new Uppercase);
 // ----------------------------
 
 // Inject the ruleset to check ---
-$check = new Check;
+$data = array('name' => 'Valla');
 
-$check->setRuleset($rules);
+$valid = new Valid($data);
+
+$valid->setRuleset($rules);
 // -------------------------------
 
-// ...
-```
+$valid->addRule('name', 'uppercase');
 
-Now the rule `uppercase` can be used as a validation rule:
-
-``` php
-protected $rules = array(
-
-    'name' => 'required|uppercase',
-
-);
-```
-
-## Built-in rules
-
-Valla ships with 13 built-in rules, each pre-loaded in the default `Ruleset`:
-
-### contains
-
-Checks that the value contains the given substring. Non-string values fail automatically. The error produced is `must contain <needle>`.
-
-``` php
-use Rougin\Valla\Ruleset;
-use Rougin\Valla\Valid;
-
-$data = array('name' => 'Jane');
-
-$valid = new Valid($data);
-
-$valid->withRule('name', 'contains:Doe');
-
-$valid->passed(); // false, error: "Name must contain Doe"
-```
-
-### `creditCard`
-Validates a credit card number using the Luhn algorithm. Dashes and spaces are stripped before checking. The error produced is `must be a valid credit card number`.
-
-``` php
-$data = array('card' => '123456789');
-
-$rules = (new Ruleset)->resolve('creditCard');
-$valid = new Valid($data);
-$valid->addRule($rules[0], 'card');
-
-$valid->passed(); // false, error: "Card must be a valid credit card number"
-```
-
-### `email`
-Validates a properly formatted email address. Non-string values fail automatically. The error produced is `is not a valid email address`.
-
-``` php
-$data = array('email' => 'not-an-email');
-
-$rules = (new Ruleset)->resolve('email');
-$valid = new Valid($data);
-$valid->addRule($rules[0], 'email');
-
-$valid->passed(); // false, error: "Email is not a valid email address"
-```
-
-### `in`
-Checks that the value matches one of the listed values. The error produced is `contains invalid value`.
-
-``` php
-$data = array('role' => 'guest');
-
-$rules = (new Ruleset)->resolve('in:admin,editor');
-$valid = new Valid($data);
-$valid->addRule($rules[0], 'role');
-
-$valid->passed(); // false, error: "Role contains invalid value"
-```
-
-### `instanceOf`
-Validates that the value is an instance of the given class. Non-object values fail automatically. The error produced is `must be an instance of '<class>'`.
-
-``` php
-$data = array('obj' => new \stdClass);
-
-$rules = (new Ruleset)->resolve('instanceOf:\DateTime');
-$valid = new Valid($data);
-$valid->addRule($rules[0], 'obj');
-
-$valid->passed(); // false, error: "Obj must be an instance of 'DateTime'"
-```
-
-### `lengthMax`
-Checks that the value does not exceed the given character length. Non-string values fail automatically. The error produced is `must not exceed <max> characters`.
-
-``` php
-$data = array('name' => 'too long');
-
-$rules = (new Ruleset)->resolve('lengthMax:5');
-$valid = new Valid($data);
-$valid->addRule($rules[0], 'name');
-
-$valid->passed(); // false, error: "Name must not exceed 5 characters"
-```
-
-### `lengthMin`
-Checks that the value meets the given minimum character length. Non-string values fail automatically. The error produced is `must be at least <min> characters long`.
-
-``` php
-$data = array('name' => 'Jo');
-
-$rules = (new Ruleset)->resolve('lengthMin:5');
-$valid = new Valid($data);
-$valid->addRule($rules[0], 'name');
-
-$valid->passed(); // false, error: "Name must be at least 5 characters long"
-```
-
-### `notIn`
-Checks that the value does **not** match any of the listed values. The error produced is `contains invalid value`.
-
-``` php
-$data = array('role' => 'admin');
-
-$rules = (new Ruleset)->resolve('notIn:admin,editor');
-$valid = new Valid($data);
-$valid->addRule($rules[0], 'role');
-
-$valid->passed(); // false, error: "Role contains invalid value"
-```
-
-### `numeric`
-Checks that the value is numeric. The error produced is `must be numeric`.
-
-``` php
-$data = array('age' => 'abc');
-
-$rules = (new Ruleset)->resolve('numeric');
-$valid = new Valid($data);
-$valid->addRule($rules[0], 'age');
-
-$valid->passed(); // false, error: "Age must be numeric"
-```
-
-### `required`
-Ensures the field is present and not empty. By default, a value is considered empty if it is `null` or a trimmed empty string. Append `:true` for strict mode, which only rejects `null`. The error produced is `is required`.
-
-``` php
-$data = array('name' => '');
-
-$rules = (new Ruleset)->resolve('required');
-$valid = new Valid($data);
-$valid->addRule($rules[0], 'name');
-
-$valid->passed(); // false, error: "Name is required"
-```
-
-### `requiredWith`
-Makes the field required only when at least one of the listed fields is present and non-empty. For strict mode (null only), append `:true` as the last argument. The error produced is `is required`.
-
-``` php
-$data = array('company_name' => '', 'is_company' => 'yes');
-
-$rules = (new Ruleset)->resolve('requiredWith:is_company');
-$valid = new Valid($data);
-$valid->addRule($rules[0], 'company_name');
-
-$valid->passed(); // false, error: "Company_name is required"
-```
-
-### `requiredWithout`
-Makes the field required only when at least one of the listed fields is absent or empty. For strict mode (null only), append `:true` as the last argument. The error produced is `is required`.
-
-``` php
-$data = array('phone' => '');
-
-$rules = (new Ruleset)->resolve('requiredWithout:email');
-$valid = new Valid($data);
-$valid->addRule($rules[0], 'phone');
-
-$valid->passed(); // false, error: "Phone is required"
-```
-
-### `subset`
-Checks that every item in the value (an array) belongs to the listed set. Non-array values fail automatically. The error produced is `contains an item that is not in the list`.
-
-``` php
-$data = array('options' => array('a', 'd'));
-
-$rules = (new Ruleset)->resolve('subset:a,b,c');
-$valid = new Valid($data);
-$valid->addRule($rules[0], 'options');
-
-$valid->passed(); // false, error: "Options contains an item that is not in the list"
+// Returns "Name must contain Doe" ---
+if (! $valid->passed())
+{
+    echo $valid->firstError();
+}
+// -----------------------------------
 ```
 
 ## Using PSR-7 requests
