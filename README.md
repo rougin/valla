@@ -178,10 +178,154 @@ class UserCheck extends Check
 }
 ```
 
+## Adding custom rules
+
+Custom rules can be added by implementing to `RuleInterface`:
+
+``` php
+namespace Rougin\Test\Rules;
+
+use Rougin\Valla\Check;
+use Rougin\Valla\RuleInterface;
+use Rougin\Valla\Ruleset;
+
+class Uppercase implements RuleInterface
+{
+    public function getError()
+    {
+        return 'must be uppercase';
+    }
+
+    public function getName()
+    {
+        return 'uppercase';
+    }
+
+    public function passed($value, array $data)
+    {
+        return strtoupper($value) === $value;
+    }
+
+    public function setValue(array $values)
+    {
+        return $this;
+    }
+}
+```
+
+To register the custom rule, add it to a `Ruleset` class then set it to the `Valid` class:
+
+``` php
+use Rougin\Test\Rules\Uppercase;
+use Rougin\Valla\Valid;
+use Rougin\Valla\Ruleset;
+
+// Register the custom rule ---
+$rules = new Ruleset;
+
+$rules->addRule(new Uppercase);
+// ----------------------------
+
+// Inject the ruleset to check ---
+$data = array('name' => 'Valla');
+
+$valid = new Valid($data);
+
+$valid->setRuleset($rules);
+// -------------------------------
+
+$valid->addRule('name', 'uppercase');
+
+// Returns "Name must contain Doe" ---
+if (! $valid->passed())
+{
+    echo $valid->firstError();
+}
+// -----------------------------------
+```
+
+## Using PSR-7 requests
+
+If using `ServerRequestInterface` from [PSR-7](https://www.php-fig.org/psr/psr-7/), the `Request` class provides a convenient way to validate request data:
+
+``` php
+use Rougin\Valla\Request;
+
+class UserCheck extends Request
+{
+    /**
+     * @var array<string, string>
+     */
+    protected $aliases = array(
+
+        'username' => 'name',
+        'email_add' => 'email',
+        'new_age' => 'age',
+
+    );
+
+    // ...
+}
+```
+
+The `Request` class provides two methods for validation: `isParamsValid` for validating query parameters and `isParsedValid` for validating the parsed body:
+
+``` php
+$check = new UserCheck;
+
+// Should return the ServerRequestInterface ---
+$request = Http::getServerRequest();
+// --------------------------------------------
+
+// Checks against data from "getQueryParams" ---
+if ($check->isParamsValid($request))
+{
+    // Query parameters are valid
+}
+// ---------------------------------------------
+
+// Checks against data from "getParsedBody" ---
+if ($check->isParsedValid($request))
+{
+    // Parsed body is valid
+}
+// --------------------------------------------
+```
+
+When an alias is specified, it will be used to look for the field in the `ServerRequestInterface` data. For example, if the request data contains a `username` field, it will be validated against the rules defined for the `name` field.
+
+## Overriding `valid` method
+
+When extending the `Request` class and overriding the `valid` method, the `setAlias` method must be called to apply the defined aliases:
+
+``` php
+use Rougin\Valla\Request;
+
+class UserCheck extends Request
+{
+    // ...
+
+    public function valid($data)
+    {
+        // Always include this if aliases are defined ---
+        $data = $this->setAlias($data);
+        // ----------------------------------------------
+
+        if (! parent::valid($data))
+        {
+            return count($this->errors) === 0;
+        }
+
+        // Add extra custom validation conditions here
+
+        return count($this->errors) === 0;
+    }
+}
+```
 
 ## Built-in rules
 
-Valla ships with 13 built-in rules, each pre-loaded in the default `Ruleset`:
+Valla ships with 43 built-in rules, each pre-loaded in the default `Ruleset`:
 
 ### contains
 
@@ -196,12 +340,11 @@ $valid = new Valid($data);
 
 $valid->addRule('name', 'contains:Doe');
 
-// Returns "Name must contain Doe" ---
 if (! $valid->passed())
 {
+    // "Name must contain Doe"
     echo $valid->firstError();
 }
-// -----------------------------------
 ```
 
 ### creditCard
@@ -377,12 +520,11 @@ $valid = new Valid($data);
 
 $valid->addRule('name', 'required');
 
-// Returns "Name is required" ---
 if (! $valid->passed())
 {
+    // "Name is required"
     echo $valid->firstError();
 }
-// --------------------------------
 ```
 
 ### requiredWith
@@ -445,148 +587,600 @@ if (! $valid->passed())
 }
 ```
 
-## Adding custom rules
+### accepted
 
-Custom rules can be added by implementing to `RuleInterface`:
-
-``` php
-namespace Rougin\Test\Rules;
-
-use Rougin\Valla\Check;
-use Rougin\Valla\RuleInterface;
-use Rougin\Valla\Ruleset;
-
-class Uppercase implements RuleInterface
-{
-    public function getError()
-    {
-        return 'must be uppercase';
-    }
-
-    public function getName()
-    {
-        return 'uppercase';
-    }
-
-    public function passed($value, array $data)
-    {
-        return strtoupper($value) === $value;
-    }
-
-    public function setValue(array $values)
-    {
-        return $this;
-    }
-}
-```
-
-To register the custom rule, add it to a `Ruleset` class then set it to the `Valid` class:
+Checks that the value is one of yes, on, 1, or true:
 
 ``` php
-use Rougin\Test\Rules\Uppercase;
 use Rougin\Valla\Valid;
-use Rougin\Valla\Ruleset;
 
-// Register the custom rule ---
-$rules = new Ruleset;
-
-$rules->addRule(new Uppercase);
-// ----------------------------
-
-// Inject the ruleset to check ---
-$data = array('name' => 'Valla');
+$data = array('terms' => 'no');
 
 $valid = new Valid($data);
 
-$valid->setRuleset($rules);
-// -------------------------------
+$valid->addRule('terms', 'accepted');
 
-$valid->addRule('name', 'uppercase');
-
-// Returns "Name must contain Doe" ---
 if (! $valid->passed())
 {
+    // "Terms is not accepted"
     echo $valid->firstError();
 }
-// -----------------------------------
 ```
 
-## Using PSR-7 requests
+### alpha
 
-If using `ServerRequestInterface` from [PSR-7](https://www.php-fig.org/psr/psr-7/), the `Request` class provides a convenient way to validate request data:
+Checks that the value contains only alphabetic characters:
 
 ``` php
-use Rougin\Valla\Request;
+use Rougin\Valla\Valid;
 
-class UserCheck extends Request
+$data = array('name' => '123');
+
+$valid = new Valid($data);
+
+$valid->addRule('name', 'alpha');
+
+if (! $valid->passed())
 {
-    /**
-     * @var array<string, string>
-     */
-    protected $aliases = array(
-
-        'username' => 'name',
-        'email_add' => 'email',
-        'new_age' => 'age',
-
-    );
-
-    // ...
+    // "Name must contain only alphabetic characters"
+    echo $valid->firstError();
 }
 ```
 
-The `Request` class provides two methods for validation: `isParamsValid` for validating query parameters and `isParsedValid` for validating the parsed body:
+### alphaNum
+
+Checks that the value contains only alpha-numeric characters:
 
 ``` php
-$check = new UserCheck;
+use Rougin\Valla\Valid;
 
-// Should return the ServerRequestInterface ---
-$request = Http::getServerRequest();
-// --------------------------------------------
+$data = array('name' => 'test!@#');
 
-// Checks against data from "getQueryParams" ---
-if ($check->isParamsValid($request))
+$valid = new Valid($data);
+
+$valid->addRule('name', 'alphaNum');
+
+if (! $valid->passed())
 {
-    // Query parameters are valid
+    // "Name must contain only alpha-numeric characters"
+    echo $valid->firstError();
 }
-// ---------------------------------------------
-
-// Checks against data from "getParsedBody" ---
-if ($check->isParsedValid($request))
-{
-    // Parsed body is valid
-}
-// --------------------------------------------
 ```
 
-When an alias is specified, it will be used to look for the field in the `ServerRequestInterface` data. For example, if the request data contains a `username` field, it will be validated against the rules defined for the `name` field.
+### array
 
-## Overriding the `valid` method
-
-When extending the `Request` class and overriding the `valid` method, the `setAlias` method must be called to apply the defined aliases:
+Checks that the value is an array:
 
 ``` php
-use Rougin\Valla\Request;
+use Rougin\Valla\Valid;
 
-class UserCheck extends Request
+$data = array('items' => 'string');
+
+$valid = new Valid($data);
+
+$valid->addRule('items', 'array');
+
+if (! $valid->passed())
 {
-    // ...
+    // "Items must be an array"
+    echo $valid->firstError();
+}
+```
 
-    public function valid($data)
-    {
-        // Always include this if aliases are defined ---
-        $data = $this->setAlias($data);
-        // ----------------------------------------------
+### arrayHasKeys
 
-        if (! parent::valid($data))
-        {
-            return count($this->errors) === 0;
-        }
+Checks that the array value contains all of the specified keys:
 
-        // Add extra custom validation conditions here
+``` php
+use Rougin\Valla\Valid;
 
-        return count($this->errors) === 0;
-    }
+$data = array('data' => array('a' => 1));
+
+$valid = new Valid($data);
+
+$valid->addRule('data', 'arrayHasKeys:a,b');
+
+if (! $valid->passed())
+{
+    // "Data must contain the required keys"
+    echo $valid->firstError();
+}
+```
+
+### ascii
+
+Checks that the value contains only ASCII characters:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('name' => "J\xC3\xA1ne");
+
+$valid = new Valid($data);
+
+$valid->addRule('name', 'ascii');
+
+if (! $valid->passed())
+{
+    // "Name must contain only ASCII characters"
+    echo $valid->firstError();
+}
+```
+
+### between
+
+Checks that the numeric value falls between the given minimum and maximum:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('age' => 25);
+
+$valid = new Valid($data);
+
+$valid->addRule('age', 'between:1,20');
+
+if (! $valid->passed())
+{
+    // "Age must be between 1 and 20"
+    echo $valid->firstError();
+}
+```
+
+### boolean
+
+Checks that the value is a boolean:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('flag' => 'yes');
+
+$valid = new Valid($data);
+
+$valid->addRule('flag', 'boolean');
+
+if (! $valid->passed())
+{
+    // "Flag must be a boolean"
+    echo $valid->firstError();
+}
+```
+
+### containsUnique
+
+Checks that the array value contains only unique values:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('items' => array('a', 'b', 'a'));
+
+$valid = new Valid($data);
+
+$valid->addRule('items', 'containsUnique');
+
+if (! $valid->passed())
+{
+    // "Items must contain unique values only"
+    echo $valid->firstError();
+}
+```
+
+### date
+
+Checks that the value is a valid date string:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('birthday' => 'not-a-date');
+
+$valid = new Valid($data);
+
+$valid->addRule('birthday', 'date');
+
+if (! $valid->passed())
+{
+    // "Birthday must be a valid date"
+    echo $valid->firstError();
+}
+```
+
+### dateAfter
+
+Checks that the value is a date after the specified date:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('date' => '2020-01-01');
+
+$valid = new Valid($data);
+
+$valid->addRule('date', 'dateAfter:2023-01-01');
+
+if (! $valid->passed())
+{
+    // "Date must be a date after 2023-01-01"
+    echo $valid->firstError();
+}
+```
+
+### dateBefore
+
+Checks that the value is a date before the specified date:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('date' => '2024-01-01');
+
+$valid = new Valid($data);
+
+$valid->addRule('date', 'dateBefore:2023-01-01');
+
+if (! $valid->passed())
+{
+    // "Date must be a date before 2023-01-01"
+    echo $valid->firstError();
+}
+```
+
+### dateFormat
+
+Checks that the value matches the specified date format (e.g., `Y-m-d`):
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('date' => '01-01-2023');
+
+$valid = new Valid($data);
+
+$valid->addRule('date', 'dateFormat:Y-m-d');
+
+if (! $valid->passed())
+{
+    // "Date must be a valid date format"
+    echo $valid->firstError();
+}
+```
+
+### different
+
+Checks that the value is different from the value of another field:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('a' => 'hello', 'b' => 'hello');
+
+$valid = new Valid($data);
+
+$valid->addRule('a', 'different:b');
+
+if (! $valid->passed())
+{
+    // "A must be different from b"
+    echo $valid->firstError();
+}
+```
+
+### emailDNS
+
+Checks that the value is an email address with an active domain (MX record):
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('email' => 'test@nonexistent-domain.invalid');
+
+$valid = new Valid($data);
+
+$valid->addRule('email', 'emailDNS');
+
+if (! $valid->passed())
+{
+    // "Email must be a valid email address with active domain"
+    echo $valid->firstError();
+}
+```
+
+### equals
+
+Checks that the value equals the value of another field:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('a' => 'hello', 'b' => 'world');
+
+$valid = new Valid($data);
+
+$valid->addRule('a', 'equals:b');
+
+if (! $valid->passed())
+{
+    // "A must be equal to b"
+    echo $valid->firstError();
+}
+```
+
+### integer
+
+Checks that the value is an integer with an optional strict mode:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('age' => 'abc');
+
+$valid = new Valid($data);
+
+$valid->addRule('age', 'integer');
+
+if (! $valid->passed())
+{
+    // "Age must be an integer"
+    echo $valid->firstError();
+}
+```
+
+### ip
+
+Checks that the value is a valid IP address:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('ip' => 'not-an-ip');
+
+$valid = new Valid($data);
+
+$valid->addRule('ip', 'ip');
+
+if (! $valid->passed())
+{
+    // "Ip must be a valid IP address"
+    echo $valid->firstError();
+}
+```
+
+### ipv4
+
+Checks that the value is a valid IPv4 address:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('ip' => '::1');
+
+$valid = new Valid($data);
+
+$valid->addRule('ip', 'ipv4');
+
+if (! $valid->passed())
+{
+    // "Ip must be a valid IPv4 address"
+    echo $valid->firstError();
+}
+```
+
+### ipv6
+
+Checks that the value is a valid IPv6 address:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('ip' => '192.168.1.1');
+
+$valid = new Valid($data);
+
+$valid->addRule('ip', 'ipv6');
+
+if (! $valid->passed())
+{
+    // "Ip must be a valid IPv6 address"
+    echo $valid->firstError();
+}
+```
+
+### length
+
+Checks that the string length matches an exact value or falls between min and max:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('name' => 'Jo');
+
+$valid = new Valid($data);
+
+$valid->addRule('name', 'length:5');
+
+if (! $valid->passed())
+{
+    // "Name must be exactly 5 characters"
+    echo $valid->firstError();
+}
+```
+
+### lengthBetween
+
+Checks that the string length falls between the given min and max:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('name' => 'too long');
+
+$valid = new Valid($data);
+
+$valid->addRule('name', 'lengthBetween:1,5');
+
+if (! $valid->passed())
+{
+    // "Name must be between 1 and 5 characters"
+    echo $valid->firstError();
+}
+```
+
+### listContains
+
+Checks that the array value contains the specified item:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('items' => array('a', 'b'));
+
+$valid = new Valid($data);
+
+$valid->addRule('items', 'listContains:c');
+
+if (! $valid->passed())
+{
+    // "Items must contain the specified value"
+    echo $valid->firstError();
+}
+```
+
+### max
+
+Checks that the numeric value does not exceed the given maximum:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('age' => 25);
+
+$valid = new Valid($data);
+
+$valid->addRule('age', 'max:20');
+
+if (! $valid->passed())
+{
+    // "Age must not exceed 20"
+    echo $valid->firstError();
+}
+```
+
+### min
+
+Checks that the numeric value is at least the given minimum:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('age' => 5);
+
+$valid = new Valid($data);
+
+$valid->addRule('age', 'min:10');
+
+if (! $valid->passed())
+{
+    // "Age must be at least 10"
+    echo $valid->firstError();
+}
+```
+
+### optional
+
+Always passes regardless of the value, allowing a field to be optional:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('field' => '');
+
+$valid = new Valid($data);
+
+$valid->addRule('field', 'optional');
+
+// [NOTE] Optional rules always pass
+$valid->passed();
+```
+
+### regex
+
+Checks that the value matches the given regular expression:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('name' => 'hello');
+
+$valid = new Valid($data);
+
+$valid->addRule('name', 'regex:/^[0-9]+$/');
+
+if (! $valid->passed())
+{
+    // "Name does not match the required pattern"
+    echo $valid->firstError();
+}
+```
+
+### slug
+
+Checks that the value is a valid slug (alpha-numeric, dashes, underscores):
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('slug' => 'not a slug!');
+
+$valid = new Valid($data);
+
+$valid->addRule('slug', 'slug');
+
+if (! $valid->passed())
+{
+    // "Slug must be a valid slug"
+    echo $valid->firstError();
+}
+```
+
+### url
+
+Checks that the value is a valid URL starting with http, https, or ftp:
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('link' => 'not-a-url');
+
+$valid = new Valid($data);
+
+$valid->addRule('link', 'url');
+
+if (! $valid->passed())
+{
+    // "Link must be a valid URL"
+    echo $valid->firstError();
+}
+```
+
+### urlActive
+
+Checks that the value is a valid URL with an active domain (DNS record):
+
+``` php
+use Rougin\Valla\Valid;
+
+$data = array('link' => 'http://nonexistent-domain.invalid');
+
+$valid = new Valid($data);
+
+$valid->addRule('link', 'urlActive');
+
+if (! $valid->passed())
+{
+    // "Link must be a valid URL with active domain"
+    echo $valid->firstError();
 }
 ```
 
