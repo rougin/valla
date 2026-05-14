@@ -44,7 +44,7 @@ class Different implements RuleInterface
      *
      * @return boolean
      */
-    public function passed($value, $data)
+    public function passed($value, array $data)
     {
         if (! isset($data[$this->field]))
         {

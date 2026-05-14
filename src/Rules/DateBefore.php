@@ -44,7 +44,7 @@ class DateBefore implements RuleInterface
      *
      * @return boolean
      */
-    public function passed($value, $data)
+    public function passed($value, array $data)
     {
         $vtime = $value instanceof \DateTime ? $value->getTimestamp() : strtotime($value);
 

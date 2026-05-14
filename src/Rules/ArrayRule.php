@@ -39,7 +39,7 @@ class ArrayRule implements RuleInterface
      *
      * @return boolean
      */
-    public function passed($value, $data)
+    public function passed($value, array $data)
     {
         return is_array($value);
     }

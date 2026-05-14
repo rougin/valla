@@ -49,7 +49,7 @@ class LengthBetween implements RuleInterface
      *
      * @return boolean
      */
-    public function passed($value, $data)
+    public function passed($value, array $data)
     {
         if (! is_string($value))
         {

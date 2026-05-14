@@ -39,7 +39,7 @@ class Ascii implements RuleInterface
      *
      * @return boolean
      */
-    public function passed($value, $data)
+    public function passed($value, array $data)
     {
         return preg_match('/[^\x00-\x7F]/', $value) === 0;
     }

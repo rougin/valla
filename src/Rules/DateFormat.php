@@ -44,7 +44,7 @@ class DateFormat implements RuleInterface
      *
      * @return boolean
      */
-    public function passed($value, $data)
+    public function passed($value, array $data)
     {
         $parsed = date_parse_from_format($this->format, $value);
 

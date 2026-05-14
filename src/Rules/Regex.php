@@ -44,7 +44,7 @@ class Regex implements RuleInterface
      *
      * @return boolean
      */
-    public function passed($value, $data)
+    public function passed($value, array $data)
     {
         return preg_match($this->pattern, $value) === 1;
     }
