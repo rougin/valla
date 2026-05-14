@@ -35,6 +35,11 @@ class Valid
     protected $rules = array();
 
     /**
+     * @var \Rougin\Valla\Ruleset|null
+     */
+    protected $ruleset = null;
+
+    /**
      * @param array<string, mixed> $data
      */
     public function __construct($data = array())
@@ -43,18 +48,40 @@ class Valid
     }
 
     /**
-     * @param \Rougin\Valla\RuleInterface $rule
-     * @param string                      $field
+     * @param string $field
+     * @param string $text
      *
      * @return self
      */
-    public function addRule(RuleInterface $rule, $field)
+    public function addRule($field, $text)
     {
-        $this->rules[] = $rule;
+        $ruleset = $this->getRuleset();
 
-        $this->fields[] = $field;
+        $items = $ruleset->resolve($text);
+
+        foreach ($items as $item)
+        {
+            $this->rules[] = $item;
+
+            $this->fields[] = $field;
+        }
 
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function firstError()
+    {
+        if (! $this->errors)
+        {
+            return null;
+        }
+
+        $values = array_values($this->errors);
+
+        return $values[0][0];
     }
 
     /**
@@ -63,6 +90,19 @@ class Valid
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    /**
+     * @return \Rougin\Valla\Ruleset
+     */
+    public function getRuleset()
+    {
+        if ($this->ruleset === null)
+        {
+            return new Ruleset;
+        }
+
+        return $this->ruleset;
     }
 
     /**
@@ -125,6 +165,18 @@ class Valid
     public function setLabels(array $labels)
     {
         $this->labels = $labels;
+
+        return $this;
+    }
+
+    /**
+     * @param \Rougin\Valla\Ruleset $ruleset
+     *
+     * @return self
+     */
+    public function setRuleset(Ruleset $ruleset)
+    {
+        $this->ruleset = $ruleset;
 
         return $this;
     }

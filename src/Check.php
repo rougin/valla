@@ -142,21 +142,18 @@ class Check
 
         $valid->setLabels($labels);
 
-        // Resolve the defined rules ----------
+        // Resolve the defined rules -----
         $ruleset = $this->getRuleset();
+
+        $valid->setRuleset($ruleset);
 
         $rules = $this->rules($data);
 
         foreach ($rules as $key => $value)
         {
-            $items = $ruleset->resolve($value);
-
-            foreach ($items as $item)
-            {
-                $valid->addRule($item, $key);
-            }
+            $valid->addRule($key, $value);
         }
-        // ------------------------------------
+        // -------------------------------
 
         if ($valid->passed())
         {

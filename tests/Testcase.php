@@ -22,16 +22,9 @@ class Testcase extends Legacy
      */
     protected function resolveRule($data, $field, $text)
     {
-        $ruleset = new Ruleset;
-
         $valid = new Valid($data);
 
-        $rules = $ruleset->resolve($text);
-
-        foreach ($rules as $rule)
-        {
-            $valid->addRule($rule, $field);
-        }
+        $valid->addRule($field, $text);
 
         return $valid;
     }
