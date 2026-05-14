@@ -17,24 +17,6 @@ class Contains implements RuleInterface
     protected $needle;
 
     /**
-     * Returns the name of the rule.
-     *
-     * @return string
-     */
-    public static function getName()
-    {
-        return 'contains';
-    }
-
-    /**
-     * @param string $needle
-     */
-    public function __construct($needle)
-    {
-        $this->needle = $needle;
-    }
-
-    /**
      * Returns the error message template.
      *
      * @return string
@@ -42,6 +24,16 @@ class Contains implements RuleInterface
     public function getError()
     {
         return sprintf('must contain %s', $this->needle);
+    }
+
+    /**
+     * Returns the name of the rule.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'contains';
     }
 
     /**
@@ -62,4 +54,17 @@ class Contains implements RuleInterface
         return strpos($value, $this->needle) !== false;
     }
 
+    /**
+     * Sets the parameter values for the rule.
+     *
+     * @param string[] $values
+     *
+     * @return self
+     */
+    public function setValue(array $values)
+    {
+        $this->needle = isset($values[0]) ? $values[0] : '';
+
+        return $this;
+    }
 }

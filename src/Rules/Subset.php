@@ -17,24 +17,6 @@ class Subset implements RuleInterface
     protected $haystack;
 
     /**
-     * Returns the name of the rule.
-     *
-     * @return string
-     */
-    public static function getName()
-    {
-        return 'subset';
-    }
-
-    /**
-     * @param mixed[] $haystack
-     */
-    public function __construct(array $haystack)
-    {
-        $this->haystack = $haystack;
-    }
-
-    /**
      * Returns the error message template.
      *
      * @return string
@@ -42,6 +24,16 @@ class Subset implements RuleInterface
     public function getError()
     {
         return 'contains an item that is not in the list';
+    }
+
+    /**
+     * Returns the name of the rule.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'subset';
     }
 
     /**
@@ -68,5 +60,19 @@ class Subset implements RuleInterface
         }
 
         return true;
+    }
+
+    /**
+     * Sets the parameter values for the rule.
+     *
+     * @param string[] $values
+     *
+     * @return self
+     */
+    public function setValue(array $values)
+    {
+        $this->haystack = $values;
+
+        return $this;
     }
 }

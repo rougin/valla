@@ -25,7 +25,7 @@ class DynamicCheck extends Check
      *
      * @return array<string, string>
      */
-    public function rules($data)
+    public function rules(array $data)
     {
         if (isset($data['is_company']) && $data['is_company'])
         {

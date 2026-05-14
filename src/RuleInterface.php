@@ -10,18 +10,18 @@ namespace Rougin\Valla;
 interface RuleInterface
 {
     /**
-     * Returns the name of the rule.
-     *
-     * @return string
-     */
-    public static function getName();
-
-    /**
      * Returns the error message template.
      *
      * @return string
      */
     public function getError();
+
+    /**
+     * Returns the name of the rule.
+     *
+     * @return string
+     */
+    public function getName();
 
     /**
      * Checks if the specified value passes the rule.
@@ -32,4 +32,13 @@ interface RuleInterface
      * @return boolean
      */
     public function passed($value, $data);
+
+    /**
+     * Sets the parameter values for the rule.
+     *
+     * @param string[] $values
+     *
+     * @return self
+     */
+    public function setValue(array $values);
 }

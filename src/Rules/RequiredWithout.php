@@ -22,27 +22,6 @@ class RequiredWithout implements RuleInterface
     protected $strict;
 
     /**
-     * Returns the name of the rule.
-     *
-     * @return string
-     */
-    public static function getName()
-    {
-        return 'requiredWithout';
-    }
-
-    /**
-     * @param string[] $fields
-     * @param boolean  $strict
-     */
-    public function __construct(array $fields, $strict = false)
-    {
-        $this->fields = $fields;
-
-        $this->strict = $strict;
-    }
-
-    /**
      * Returns the error message template.
      *
      * @return string
@@ -50,6 +29,16 @@ class RequiredWithout implements RuleInterface
     public function getError()
     {
         return 'is required';
+    }
+
+    /**
+     * Returns the name of the rule.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'requiredWithout';
     }
 
     /**
@@ -76,11 +65,31 @@ class RequiredWithout implements RuleInterface
 
         if ($required)
         {
-            $rule = new Required($this->strict);
+            $rule = new Required;
+
+            $rule->setValue($this->strict ? array('true') : array());
 
             return $rule->passed($value, $data);
         }
 
         return true;
+    }
+
+    /**
+     * Sets the parameter values for the rule.
+     *
+     * @param string[] $values
+     *
+     * @return self
+     */
+    public function setValue(array $values)
+    {
+        $last = end($values);
+
+        $this->strict = is_string($last) && trim($last) === 'true';
+
+        $this->fields = $values;
+
+        return $this;
     }
 }

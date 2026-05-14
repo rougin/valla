@@ -17,24 +17,6 @@ class Required implements RuleInterface
     protected $strict;
 
     /**
-     * Returns the name of the rule.
-     *
-     * @return string
-     */
-    public static function getName()
-    {
-        return 'required';
-    }
-
-    /**
-     * @param boolean $strict
-     */
-    public function __construct($strict = false)
-    {
-        $this->strict = $strict;
-    }
-
-    /**
      * Returns the error message template.
      *
      * @return string
@@ -42,6 +24,16 @@ class Required implements RuleInterface
     public function getError()
     {
         return 'is required';
+    }
+
+    /**
+     * Returns the name of the rule.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'required';
     }
 
     /**
@@ -60,5 +52,21 @@ class Required implements RuleInterface
         }
 
         return ! is_null($value) && (is_string($value) ? trim($value) !== '' : true);
+    }
+
+    /**
+     * Sets the parameter values for the rule.
+     *
+     * @param string[] $values
+     *
+     * @return self
+     */
+    public function setValue(array $values)
+    {
+        $last = end($values);
+
+        $this->strict = is_string($last) && trim($last) === 'true';
+
+        return $this;
     }
 }

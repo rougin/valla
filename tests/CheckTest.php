@@ -172,4 +172,50 @@ class CheckTest extends Testcase
         // Assert
         $this->assertTrue($actual);
     }
+
+    /**
+     * @return void
+     */
+    public function test_get_ruleset_returns_instance()
+    {
+        $check = new Check;
+
+        $actual = $check->getRuleset();
+
+        $this->assertInstanceOf('Rougin\Valla\Ruleset', $actual);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_set_ruleset_replaces_instance()
+    {
+        $check = new Check;
+
+        $ruleset = $check->getRuleset();
+
+        $other = new Ruleset;
+
+        $check->setRuleset($other);
+
+        $this->assertSame($other, $check->getRuleset());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_valid_uses_existing_ruleset()
+    {
+        $check = new SampleCheck;
+
+        $data = array('name' => 'John Doe');
+        $data['email'] = 'johndoe@gmail.com';
+        $data['age'] = 20;
+
+        $ruleset = $check->getRuleset();
+
+        $actual = $check->valid($data);
+
+        $this->assertTrue($actual);
+    }
 }

@@ -17,24 +17,6 @@ class LengthMax implements RuleInterface
     protected $max;
 
     /**
-     * Returns the name of the rule.
-     *
-     * @return string
-     */
-    public static function getName()
-    {
-        return 'lengthMax';
-    }
-
-    /**
-     * @param integer $max
-     */
-    public function __construct($max)
-    {
-        $this->max = (int) $max;
-    }
-
-    /**
      * Returns the error message template.
      *
      * @return string
@@ -42,6 +24,16 @@ class LengthMax implements RuleInterface
     public function getError()
     {
         return sprintf('must not exceed %d characters', $this->max);
+    }
+
+    /**
+     * Returns the name of the rule.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'lengthMax';
     }
 
     /**
@@ -60,5 +52,19 @@ class LengthMax implements RuleInterface
         }
 
         return strlen($value) <= $this->max;
+    }
+
+    /**
+     * Sets the parameter values for the rule.
+     *
+     * @param string[] $values
+     *
+     * @return self
+     */
+    public function setValue(array $values)
+    {
+        $this->max = isset($values[0]) ? (int) $values[0] : 0;
+
+        return $this;
     }
 }

@@ -12,16 +12,6 @@ use Rougin\Valla\RuleInterface;
 class CreditCard implements RuleInterface
 {
     /**
-     * Returns the name of the rule.
-     *
-     * @return string
-     */
-    public static function getName()
-    {
-        return 'creditCard';
-    }
-
-    /**
      * Returns the error message template.
      *
      * @return string
@@ -29,6 +19,16 @@ class CreditCard implements RuleInterface
     public function getError()
     {
         return 'must be a valid credit card number';
+    }
+
+    /**
+     * Returns the name of the rule.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'creditCard';
     }
 
     /**
@@ -46,7 +46,6 @@ class CreditCard implements RuleInterface
             return false;
         }
 
-        // Basic Luhn algorithm implementation or simple mock for tests
         $value = str_replace(array('-', ' '), '', (string) $value);
 
         if (! is_numeric($value))
@@ -78,5 +77,17 @@ class CreditCard implements RuleInterface
         }
 
         return $sum % 10 == 0;
+    }
+
+    /**
+     * Sets the parameter values for the rule.
+     *
+     * @param string[] $values
+     *
+     * @return self
+     */
+    public function setValue(array $values)
+    {
+        return $this;
     }
 }

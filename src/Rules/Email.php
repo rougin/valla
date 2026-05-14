@@ -12,16 +12,6 @@ use Rougin\Valla\RuleInterface;
 class Email implements RuleInterface
 {
     /**
-     * Returns the name of the rule.
-     *
-     * @return string
-     */
-    public static function getName()
-    {
-        return 'email';
-    }
-
-    /**
      * Returns the error message template.
      *
      * @return string
@@ -29,6 +19,16 @@ class Email implements RuleInterface
     public function getError()
     {
         return 'is not a valid email address';
+    }
+
+    /**
+     * Returns the name of the rule.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'email';
     }
 
     /**
@@ -47,5 +47,17 @@ class Email implements RuleInterface
         }
 
         return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    /**
+     * Sets the parameter values for the rule.
+     *
+     * @param string[] $values
+     *
+     * @return self
+     */
+    public function setValue(array $values)
+    {
+        return $this;
     }
 }

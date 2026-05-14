@@ -17,24 +17,6 @@ class NotIn implements RuleInterface
     protected $haystack;
 
     /**
-     * Returns the name of the rule.
-     *
-     * @return string
-     */
-    public static function getName()
-    {
-        return 'notIn';
-    }
-
-    /**
-     * @param mixed[] $haystack
-     */
-    public function __construct(array $haystack)
-    {
-        $this->haystack = $haystack;
-    }
-
-    /**
      * Returns the error message template.
      *
      * @return string
@@ -42,6 +24,16 @@ class NotIn implements RuleInterface
     public function getError()
     {
         return 'contains invalid value';
+    }
+
+    /**
+     * Returns the name of the rule.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'notIn';
     }
 
     /**
@@ -55,5 +47,19 @@ class NotIn implements RuleInterface
     public function passed($value, $data)
     {
         return ! in_array($value, $this->haystack);
+    }
+
+    /**
+     * Sets the parameter values for the rule.
+     *
+     * @param string[] $values
+     *
+     * @return self
+     */
+    public function setValue(array $values)
+    {
+        $this->haystack = $values;
+
+        return $this;
     }
 }

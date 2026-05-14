@@ -12,16 +12,6 @@ use Rougin\Valla\RuleInterface;
 class Numeric implements RuleInterface
 {
     /**
-     * Returns the name of the rule.
-     *
-     * @return string
-     */
-    public static function getName()
-    {
-        return 'numeric';
-    }
-
-    /**
      * Returns the error message template.
      *
      * @return string
@@ -29,6 +19,16 @@ class Numeric implements RuleInterface
     public function getError()
     {
         return 'must be numeric';
+    }
+
+    /**
+     * Returns the name of the rule.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'numeric';
     }
 
     /**
@@ -42,5 +42,17 @@ class Numeric implements RuleInterface
     public function passed($value, $data)
     {
         return is_numeric($value);
+    }
+
+    /**
+     * Sets the parameter values for the rule.
+     *
+     * @param string[] $values
+     *
+     * @return self
+     */
+    public function setValue(array $values)
+    {
+        return $this;
     }
 }

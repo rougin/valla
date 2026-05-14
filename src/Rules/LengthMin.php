@@ -17,24 +17,6 @@ class LengthMin implements RuleInterface
     protected $min;
 
     /**
-     * Returns the name of the rule.
-     *
-     * @return string
-     */
-    public static function getName()
-    {
-        return 'lengthMin';
-    }
-
-    /**
-     * @param integer $min
-     */
-    public function __construct($min)
-    {
-        $this->min = (int) $min;
-    }
-
-    /**
      * Returns the error message template.
      *
      * @return string
@@ -42,6 +24,16 @@ class LengthMin implements RuleInterface
     public function getError()
     {
         return sprintf('must be at least %d characters long', $this->min);
+    }
+
+    /**
+     * Returns the name of the rule.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'lengthMin';
     }
 
     /**
@@ -60,5 +52,19 @@ class LengthMin implements RuleInterface
         }
 
         return strlen($value) >= $this->min;
+    }
+
+    /**
+     * Sets the parameter values for the rule.
+     *
+     * @param string[] $values
+     *
+     * @return self
+     */
+    public function setValue(array $values)
+    {
+        $this->min = isset($values[0]) ? (int) $values[0] : 0;
+
+        return $this;
     }
 }

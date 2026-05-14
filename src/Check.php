@@ -17,12 +17,17 @@ class Check
     /**
      * @var array<string, string>
      */
-    protected $rules = array();
+    protected $labels = array();
 
     /**
      * @var array<string, string>
      */
-    protected $labels = array();
+    protected $rules = array();
+
+    /**
+     * @var \Rougin\Valla\Ruleset|null
+     */
+    protected $ruleset = null;
 
     /**
      * Returns all errors after validation.
@@ -62,15 +67,44 @@ class Check
     }
 
     /**
+     * Returns the ruleset instance.
+     *
+     * @return \Rougin\Valla\Ruleset
+     */
+    public function getRuleset()
+    {
+        if ($this->ruleset === null)
+        {
+            return new Ruleset;
+        }
+
+        return $this->ruleset;
+    }
+
+    /**
      * Returns the specified rules based on payload.
      *
      * @param array<string, mixed> $data
      *
      * @return array<string, string>
      */
-    public function rules($data)
+    public function rules(array $data)
     {
         return $this->rules;
+    }
+
+    /**
+     * Sets the ruleset instance.
+     *
+     * @param \Rougin\Valla\Ruleset $ruleset
+     *
+     * @return self
+     */
+    public function setRuleset(Ruleset $ruleset)
+    {
+        $this->ruleset = $ruleset;
+
+        return $this;
     }
 
     /**
@@ -100,22 +134,29 @@ class Check
      *
      * @return boolean
      */
-    public function valid($data)
+    public function valid(array $data)
     {
         $valid = new Valid($data);
 
-        $valid->setLabels($this->labels());
+        $labels = $this->labels();
 
-        // Initialize the defined rules --------
+        $valid->setLabels($labels);
+
+        // Resolve the defined rules ----------
+        $ruleset = $this->getRuleset();
+
         $rules = $this->rules($data);
 
         foreach ($rules as $key => $value)
         {
-            $rule = new Rule($valid);
+            $items = $ruleset->resolve($value);
 
-            $valid = $rule->match($key, $value);
+            foreach ($items as $item)
+            {
+                $valid->addRule($item, $key);
+            }
         }
-        // -------------------------------------
+        // ------------------------------------
 
         if ($valid->passed())
         {

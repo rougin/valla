@@ -17,10 +17,8 @@ class RuleTest extends Testcase
         // Arrange
         $data = array('name' => 'John');
 
-        $rule = new Rule(new Valid($data));
-
         // Act
-        $valid = $rule->match('name', 'contains:Doe');
+        $valid = $this->resolveRule($data, 'name', 'contains:Doe');
 
         $actual = $valid->passed();
 
@@ -36,10 +34,8 @@ class RuleTest extends Testcase
         // Arrange
         $data = array('card' => '123456789');
 
-        $rule = new Rule(new Valid($data));
-
         // Act
-        $valid = $rule->match('card', 'creditCard');
+        $valid = $this->resolveRule($data, 'card', 'creditCard');
 
         $actual = $valid->passed();
 
@@ -55,12 +51,10 @@ class RuleTest extends Testcase
         // Arrange
         $data = array('obj' => new \stdClass);
 
-        $rule = new Rule(new Valid($data));
-
         // Act
         $class = 'Rougin\Valla\Fixture\DummyClass';
 
-        $valid = $rule->match('obj', 'instanceOf:' . $class);
+        $valid = $this->resolveRule($data, 'obj', 'instanceOf:' . $class);
 
         $actual = $valid->passed();
 
@@ -76,10 +70,8 @@ class RuleTest extends Testcase
         // Arrange
         $data = array('password' => '12345');
 
-        $rule = new Rule(new Valid($data));
-
         // Act
-        $valid = $rule->match('password_confirmation', 'requiredWith:password');
+        $valid = $this->resolveRule($data, 'password_confirmation', 'requiredWith:password');
 
         $actual = $valid->passed();
 
@@ -95,10 +87,8 @@ class RuleTest extends Testcase
         // Arrange
         $data = array('email' => 'not-an-email');
 
-        $rule = new Rule(new Valid($data));
-
         // Act
-        $valid = $rule->match('email', 'required|email');
+        $valid = $this->resolveRule($data, 'email', 'required|email');
 
         $actual = $valid->passed();
 
@@ -120,10 +110,8 @@ class RuleTest extends Testcase
         // Arrange
         $data = array('role' => 'admin');
 
-        $rule = new Rule(new Valid($data));
-
         // Act
-        $valid = $rule->match('role', 'notIn:admin,editor');
+        $valid = $this->resolveRule($data, 'role', 'notIn:admin,editor');
 
         $actual = $valid->passed();
 
@@ -139,10 +127,9 @@ class RuleTest extends Testcase
         // Arrange
         $data = array('email' => '');
 
-        $rule = new Rule(new Valid($data));
-
         // Act
-        $valid = $rule->match('email', 'requiredWithout:name');
+        $valid = $this->resolveRule($data, 'email', 'requiredWithout:name');
+
         $actual = $valid->passed();
 
         // Assert
@@ -157,10 +144,8 @@ class RuleTest extends Testcase
         // Arrange
         $data = array('name' => 'Jo');
 
-        $rule = new Rule(new Valid($data));
-
         // Act
-        $valid = $rule->match('name', 'lengthMin:5');
+        $valid = $this->resolveRule($data, 'name', 'lengthMin:5');
 
         $actual = $valid->passed();
 
@@ -176,10 +161,8 @@ class RuleTest extends Testcase
         // Arrange
         $data = array('name' => '');
 
-        $rule = new Rule(new Valid($data));
-
         // Act
-        $valid = $rule->match('name', 'required');
+        $valid = $this->resolveRule($data, 'name', 'required');
 
         $actual = $valid->passed();
 
@@ -195,10 +178,8 @@ class RuleTest extends Testcase
         // Arrange
         $data = array('role' => 'guest');
 
-        $rule = new Rule(new Valid($data));
-
         // Act
-        $valid = $rule->match('role', 'in:admin,editor');
+        $valid = $this->resolveRule($data, 'role', 'in:admin,editor');
 
         $actual = $valid->passed();
 
@@ -214,14 +195,13 @@ class RuleTest extends Testcase
         // Arrange
         $data = array('options' => array('a', 'd'));
 
-        $rule = new Rule(new Valid($data));
-
         // Act
-        $valid = $rule->match('options', 'subset:a,b,c');
+        $valid = $this->resolveRule($data, 'options', 'subset:a,b,c');
 
         $actual = $valid->passed();
 
         // Assert
         $this->assertFalse($actual);
     }
+
 }

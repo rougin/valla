@@ -70,8 +70,9 @@ class Valid
      */
     public function passed()
     {
-        foreach ($this->rules as $index => $item)
+        foreach ($this->rules as $index => $rule)
         {
+            // Check the field against its rule ------
             $field = $this->fields[$index];
 
             $value = null;
@@ -81,11 +82,13 @@ class Valid
                 $value = $this->data[$field];
             }
 
-            if ($item->passed($value, $this->data))
+            if ($rule->passed($value, $this->data))
             {
                 continue;
             }
+            // ---------------------------------------
 
+            // Add the error if the rule failed --------
             $label = ucfirst($field);
 
             if (array_key_exists($field, $this->labels))
@@ -93,9 +96,10 @@ class Valid
                 $label = $this->labels[$field];
             }
 
-            $error = $label . ' ' . $item->getError();
+            $error = $label . ' ' . $rule->getError();
 
             $this->errors[$field][] = $error;
+            // -----------------------------------------
         }
 
         return count($this->errors) === 0;
