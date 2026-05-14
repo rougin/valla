@@ -9,23 +9,19 @@
 A simple validation package for PHP inspired by [Valitron](https://github.com/vlucas/valitron).
 
 ``` php
-use Rougin\Valla\Check;
+use Rougin\Valla\Valid;
 
-class UserCheck extends Check
+$data = array('name' => '', 'email' => 'not-an-email');
+
+$valid = new Valid($data);
+
+$valid->addRule('name', 'required');
+$valid->addRule('email', 'required|email');
+
+if (! $valid->passed())
 {
-    protected $labels = array(
-
-        'name' => 'Name',
-        'email' => 'Email',
-
-    );
-
-    protected $rules = array(
-
-        'name' => 'required',
-        'email' => 'required|email',
-
-    );
+    // "Name is required"
+    echo $valid->firstError();
 }
 ```
 
@@ -39,142 +35,51 @@ $ composer require rougin/valla
 
 ## Basic usage
 
-The core of `Valla` is the `Check` class which is used to create a set of validation rules:
+The core of `Valla` is the `Valid` class. Create an instance with the data to validate, then add rules with `addRule()`:
 
 ``` php
-use Rougin\Valla\Check;
+use Rougin\Valla\Valid;
 
-class UserCheck extends Check
+$data = array('age' => 'abc');
+$data['email'] = 'not-an-email';
+$data['name'] = '';
+
+$valid = new Valid($data);
+
+$valid->addRule('age', 'required|numeric');
+$valid->addRule('email', 'required|email');
+$valid->addRule('name', 'required');
+
+if (! $valid->passed())
 {
-    /**
-     * @var array<string, string>
-     */
-    protected $labels = array(
+    $errors = $valid->getErrors();
 
-        'age' => 'Age',
-        'email' => 'Email',
-        'name' => 'Name',
-
-    );
-
-    /**
-     * @var array<string, string>
-     */
-    protected $rules = array(
-
-        'age' => 'required|numeric',
-        'email' => 'required|email',
-        'name' => 'required',
-
-    );
+    // "Age must be numeric"
+    echo $valid->firstError();
 }
 ```
 
-The `$labels` property defines user-friendly names for the fields, which will be used in error messages:
+### Setting labels
+
+Labels provide user-friendly field names in error messages:
 
 ``` php
-use Rougin\Valla\Check;
+use Rougin\Valla\Valid;
 
-class UserCheck extends Check
+$data = array('email' => 'not-an-email');
+
+$valid = new Valid($data);
+
+$labels = array('email' => 'Email Address');
+
+$valid->setLabels($labels);
+
+$valid->addRule('email', 'email');
+
+if (! $valid->passed())
 {
-    /**
-     * @var array<string, string>
-     */
-    protected $labels = array(
-
-        'age' => 'Age',
-        'email' => 'Email',
-        'name' => 'Name',
-
-    );
-
-    // ...
-}
-```
-
-While the `$rules` property specifies the validation rules for each field:
-
-``` php
-use Rougin\Valla\Check;
-
-class UserCheck extends Check
-{
-    // ...
-
-    /**
-     * @var array<string, string>
-     */
-    protected $rules = array(
-
-        'age' => 'required|numeric',
-        'email' => 'required|email',
-        'name' => 'required',
-
-    );
-}
-```
-
-> [!NOTE]
-> A list of available rules can be found in the [Valitron documentation](https://github.com/vlucas/valitron#validation-rules).
-
-Once the `Check` class is created, it can be used to validate an array of data, such as data from a HTTP request:
-
-``` php
-$check = new UserCheck;
-
-$data = /* e.g., data from a request */;
-
-if (! $check->valid($data))
-{
-    // Get all available errors
-    $errors = $check->errors();
-
-    // Or get only the first error
-    echo $check->firstError();
-
-    return;
-}
-
-// Data has passed validation
-```
-
-## Labels, rules
-
-For more complex scenarios, the `labels` and `rules` methods can be overridden to define them dynamically:
-
-``` php
-use Rougin\Valla\Check;
-
-class UserCheck extends Check
-{
-    /**
-     * Returns the specified labels.
-     *
-     * @return array<string, string>
-     */
-    public function labels()
-    {
-        $this->labels['is_company'] = 'Is a Company?';
-
-        return $this->labels;
-    }
-
-    /**
-     * Returns the specified rules based on the data.
-     *
-     * @param array<string, mixed> $data
-     *
-     * @return array<string, string>
-     */
-    public function rules(array $data)
-    {
-        if (array_key_exists('is_company', $data))
-        {
-            $this->rules['company_name'] = 'required';
-        }
-
-        return $this->rules;
-    }
+    // "Email Address is not a valid email address"
+    echo $valid->firstError();
 }
 ```
 
@@ -185,7 +90,6 @@ Custom rules can be added by implementing to `RuleInterface`:
 ``` php
 namespace Rougin\Test\Rules;
 
-use Rougin\Valla\Check;
 use Rougin\Valla\RuleInterface;
 use Rougin\Valla\Ruleset;
 
@@ -244,7 +148,91 @@ if (! $valid->passed())
 // -----------------------------------
 ```
 
-## Using PSR-7 requests
+## Using `Check` class
+
+The `Check` class provides a declarative, class-based approach to validation by defining rules and labels as properties. It wraps a `Valid` instance internally.
+
+### Using labels, rules
+
+The `$labels` property defines user-friendly names for the fields, while `$rules` specifies the validation rules:
+
+``` php
+use Rougin\Valla\Check;
+
+class UserCheck extends Check
+{
+    protected $labels = array(
+        'age' => 'Age',
+        'email' => 'Email',
+        'name' => 'Name',
+    );
+
+    protected $rules = array(
+        'age' => 'required|numeric',
+        'email' => 'required|email',
+        'name' => 'required',
+    );
+}
+```
+
+### Validating data
+
+Once the `Check` class is created, validate an array of data using `valid()`:
+
+``` php
+$check = new UserCheck;
+
+$data = array('name' => 'John');
+$data['age'] = 20;
+$data['email'] = 'john@example.com';
+
+if (! $check->valid($data))
+{
+    echo $check->firstError();
+}
+```
+
+### Dynamic labels, rules
+
+For more complex scenarios, the `labels` and `rules` methods can be overridden to define them dynamically:
+
+``` php
+use Rougin\Valla\Check;
+
+class UserCheck extends Check
+{
+    /**
+     * Returns the specified labels.
+     *
+     * @return array<string, string>
+     */
+    public function labels()
+    {
+        $this->labels['is_company'] = 'Is a Company?';
+
+        return $this->labels;
+    }
+
+    /**
+     * Returns the specified rules based on the data.
+     *
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, string>
+     */
+    public function rules(array $data)
+    {
+        if (array_key_exists('is_company', $data))
+        {
+            $this->rules['company_name'] = 'required';
+        }
+
+        return $this->rules;
+    }
+}
+```
+
+### Using PSR-7 requests
 
 If using `ServerRequestInterface` from [PSR-7](https://www.php-fig.org/psr/psr-7/), the `Request` class provides a convenient way to validate request data:
 
@@ -294,7 +282,8 @@ if ($check->isParsedValid($request))
 
 When an alias is specified, it will be used to look for the field in the `ServerRequestInterface` data. For example, if the request data contains a `username` field, it will be validated against the rules defined for the `name` field.
 
-## Overriding `valid` method
+
+### Overriding `valid`
 
 When extending the `Request` class and overriding the `valid` method, the `setAlias` method must be called to apply the defined aliases:
 
@@ -1183,6 +1172,7 @@ if (! $valid->passed())
     echo $valid->firstError();
 }
 ```
+
 
 ## Changelog
 
