@@ -110,7 +110,7 @@ class Valid
      *
      * @return self
      */
-    public function setData($data)
+    public function setData(array $data)
     {
         $this->data = $data;
 
@@ -122,7 +122,7 @@ class Valid
      *
      * @return self
      */
-    public function setLabels($labels)
+    public function setLabels(array $labels)
     {
         $this->labels = $labels;
 

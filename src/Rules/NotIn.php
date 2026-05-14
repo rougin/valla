@@ -44,7 +44,7 @@ class NotIn implements RuleInterface
      *
      * @return boolean
      */
-    public function passed($value, $data)
+    public function passed($value, array $data)
     {
         return ! in_array($value, $this->haystack);
     }

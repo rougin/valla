@@ -49,7 +49,7 @@ class RequiredWith implements RuleInterface
      *
      * @return boolean
      */
-    public function passed($value, $data)
+    public function passed($value, array $data)
     {
         $required = false;
 

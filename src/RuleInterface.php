@@ -31,7 +31,7 @@ interface RuleInterface
      *
      * @return boolean
      */
-    public function passed($value, $data);
+    public function passed($value, array $data);
 
     /**
      * Sets the parameter values for the rule.

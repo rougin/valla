@@ -39,7 +39,7 @@ class Numeric implements RuleInterface
      *
      * @return boolean
      */
-    public function passed($value, $data)
+    public function passed($value, array $data)
     {
         return is_numeric($value);
     }
