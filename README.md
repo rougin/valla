@@ -140,12 +140,11 @@ $valid->setRuleset($rules);
 
 $valid->addRule('name', 'uppercase');
 
-// Returns "Name must contain Doe" ---
 if (! $valid->passed())
 {
+    // "Name must be uppercase"
     echo $valid->firstError();
 }
-// -----------------------------------
 ```
 
 ## Using `Check` class
@@ -194,7 +193,7 @@ if (! $check->valid($data))
 
 ### Dynamic labels, rules
 
-For more complex scenarios, the `labels` and `rules` methods can be overridden to define them dynamically:
+For more validation scenarios, the `labels` and `rules` methods can be overridden to define them dynamically:
 
 ``` php
 use Rougin\Valla\Check;
@@ -202,32 +201,32 @@ use Rougin\Valla\Check;
 class UserCheck extends Check
 {
     /**
-     * Returns the specified labels.
-     *
      * @return array<string, string>
      */
     public function labels()
     {
-        $this->labels['is_company'] = 'Is a Company?';
+        $labels = $this->labels;
 
-        return $this->labels;
+        $labels['is_company'] = 'Is a Company?';
+
+        return $labels;
     }
 
     /**
-     * Returns the specified rules based on the data.
-     *
      * @param array<string, mixed> $data
      *
      * @return array<string, string>
      */
     public function rules(array $data)
     {
+        $rules = $this->rules;
+
         if (array_key_exists('is_company', $data))
         {
-            $this->rules['company_name'] = 'required';
+            $rules['company_name'] = 'required';
         }
 
-        return $this->rules;
+        return $rules;
     }
 }
 ```
@@ -261,9 +260,9 @@ The `Request` class provides two methods for validation: `isParamsValid` for val
 ``` php
 $check = new UserCheck;
 
-// Should return the ServerRequestInterface ---
+// Returns the "ServerRequestInterface" ---
 $request = Http::getServerRequest();
-// --------------------------------------------
+// ----------------------------------------
 
 // Checks against data from "getQueryParams" ---
 if ($check->isParamsValid($request))
