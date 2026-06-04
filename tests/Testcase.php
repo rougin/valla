@@ -12,6 +12,26 @@ use LegacyPHPUnit\TestCase as Legacy;
 class Testcase extends Legacy
 {
     /**
+     * @param class-string $exception
+     *
+     * @return void
+     */
+    protected function doExpectException($exception)
+    {
+        /** @phpstan-ignore-next-line */
+        if (method_exists($this, 'expectException'))
+        {
+            /** @phpstan-ignore-next-line */
+            $this->expectException($exception);
+
+            return;
+        }
+
+        /** @phpstan-ignore-next-line */
+        $this->setExpectedException($exception);
+    }
+
+    /**
      * Resolves a rule string and adds it to a Valid instance.
      *
      * @param array<string, mixed> $data
@@ -27,25 +47,5 @@ class Testcase extends Legacy
         $valid->addRule($field, $text);
 
         return $valid;
-    }
-
-    /**
-     * @param class-string $exception
-     *
-     * @return void
-     */
-    public function doExpectException($exception)
-    {
-        /** @phpstan-ignore-next-line */
-        if (method_exists($this, 'expectException'))
-        {
-            /** @phpstan-ignore-next-line */
-            $this->expectException($exception);
-
-            return;
-        }
-
-        /** @phpstan-ignore-next-line */
-        $this->setExpectedException($exception);
     }
 }

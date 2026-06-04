@@ -203,5 +203,4 @@ class RuleTest extends Testcase
         // Assert
         $this->assertFalse($actual);
     }
-
 }
