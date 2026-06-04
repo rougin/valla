@@ -146,6 +146,50 @@ class Valid
     }
 
     /**
+     * @deprecated since ~0.1, use "addRule" instead.
+     *
+     * Convenience method to add a single validation rule.
+     *
+     * @param callable|string $rule
+     * @param string|string[] $fields
+     *
+     * @return self
+     */
+    public function rule($rule, $fields)
+    {
+        if (! is_string($rule))
+        {
+            $text = 'Valla does not support callable rules. ';
+
+            $text .= 'Implement Rougin\Valla\RuleInterface instead.';
+
+            throw new \InvalidArgumentException($text);
+        }
+
+        $params = array_slice(func_get_args(), 2);
+
+        $text = $rule;
+
+        if (count($params) > 0)
+        {
+            /** @phpstan-ignore-next-line */
+            $text .= ':' . implode(',', $params);
+        }
+
+        if (! is_array($fields))
+        {
+            $fields = array($fields);
+        }
+
+        foreach ($fields as $field)
+        {
+            $this->addRule($field, $text);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param array<string, mixed> $data
      *
      * @return self

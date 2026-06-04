@@ -1172,10 +1172,45 @@ if (! $valid->passed())
 }
 ```
 
+## Migrating from Valitron
+
+As this was inspired from [Valitron](https://github.com/vlucas/valitron), migrating to `Valla` is simple as changing its namespace and the class name. `Valla` provides the same `rule` method for mirroring Valitron's:
+
+``` diff
+-use Valitron\Validator;
++use Rougin\Valla\Valid;
+
+-$valid = new Validator($data);
++$valid = new Valid($data);
+
+ $valid->rule('required', 'name');
+ $valid->rule('min', 'age', 5);
+ $valid->rule('required', array('name', 'email'));
+
+ if (! $valid->validate())
+ {
+     print_r($valid->errors());
+ }
+```
+
+Once migrated, update the said method to `addRule` with its required parameters:
+
+``` diff
+-$valid->rule('required', 'name');
++$valid->addRule('name', 'required');
+-$valid->rule('min', 'age', 5);
++$valid->addRule('age', 'min:5');
+-$valid->rule('required', array('name', 'email'));
++$valid->addRule('name', 'required');
++$valid->addRule('email', 'required');
+```
+
+> [!WARNING]
+> The `rule` method only accepts string rule names (e.g. `'required'`, `'min:5'`). Callable rules will not be supported. Kindly see [Adding custom rules](#adding-custom-rules) for how to create one.
 
 ## Changelog
 
-Please see [CHANGELOG][link-changelog] for more recent changes.
+Please see [CHANGELOG][link-changelog] for more recent changes and latest updates.
 
 ## Contributing
 
