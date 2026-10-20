@@ -12,6 +12,124 @@ class ValidTest extends Testcase
     /**
      * @return void
      */
+    public function test_failed_if_custom_message_for_different_rule()
+    {
+        // Arrange
+        $data = array('start_at' => '10:00');
+        $data['end_at'] = '10:00';
+
+        $valid = new Valid($data);
+
+        $valid->setLabels(array('end_at' => 'Time End'));
+
+        // Act
+        $valid->rule('different', 'end_at', 'start_at')
+            ->message('{field} must not be the same with start time.');
+
+        $valid->passed();
+
+        $errors = $valid->getErrors();
+
+        // Assert
+        $expect = 'Time End must not be the same with start time.';
+
+        $actual = $errors['end_at'][0];
+
+        $this->assertEquals($expect, $actual);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_failed_if_custom_message_for_min_rule()
+    {
+        // Arrange
+        $data = array('start_at' => 10);
+        $data['end_at'] = 5;
+
+        $valid = new Valid($data);
+
+        $valid->setLabels(array('end_at' => 'Time End'));
+
+        // Act
+        $valid->rule('min', 'end_at', $data['start_at'])
+            ->message('{field} must not be less than start time.');
+
+        $valid->passed();
+
+        $errors = $valid->getErrors();
+
+        // Assert
+        $expect = 'Time End must not be less than start time.';
+
+        $actual = $errors['end_at'][0];
+
+        $this->assertEquals($expect, $actual);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_failed_if_custom_message_for_multiple_fields()
+    {
+        // Arrange
+        $data = array('name' => '');
+        $data['email'] = '';
+
+        $valid = new Valid($data);
+
+        // Act
+        $valid->rule('required', array('name', 'email'))
+            ->message('{field} is mandatory.');
+
+        $valid->passed();
+
+        $errors = $valid->getErrors();
+
+        // Assert
+        $expect = 'Name is mandatory.';
+
+        $actual = $errors['name'][0];
+
+        $this->assertEquals($expect, $actual);
+
+        $expect = 'Email is mandatory.';
+
+        $actual = $errors['email'][0];
+
+        $this->assertEquals($expect, $actual);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_failed_if_custom_message_without_label()
+    {
+        // Arrange
+        $data = array('start_at' => 10);
+        $data['end_at'] = 5;
+
+        $valid = new Valid($data);
+
+        // Act
+        $valid->rule('min', 'end_at', $data['start_at'])
+            ->message('{field} must not be less than start time.');
+
+        $valid->passed();
+
+        $errors = $valid->getErrors();
+
+        // Assert
+        $expect = 'End_at must not be less than start time.';
+
+        $actual = $errors['end_at'][0];
+
+        $this->assertEquals($expect, $actual);
+    }
+
+    /**
+     * @return void
+     */
     public function test_failed_if_custom_rule()
     {
         $data = array('name' => 'John');

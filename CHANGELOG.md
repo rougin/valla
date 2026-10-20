@@ -2,6 +2,11 @@
 
 All notable changes to `Valla` will be documented in this file.
 
+## 0.1.2 - 2026-10-20
+
+### Added
+- `Valid::message` for backward compatibility from [Valitron](https://github.com/vlucas/valitron)
+
 ## 0.1.1 - 2026-06-05
 
 ### Added

@@ -25,6 +25,11 @@ class Valid
     protected $fields = array();
 
     /**
+     * @var integer
+     */
+    protected $index = 0;
+
+    /**
      * @var array<string, string>
      */
     protected $labels = array();
@@ -38,6 +43,11 @@ class Valid
      * @var \Rougin\Valla\Ruleset|null
      */
     protected $ruleset = null;
+
+    /**
+     * @var string[]
+     */
+    protected $texts = array();
 
     /**
      * @param array<string, mixed> $data
@@ -106,6 +116,27 @@ class Valid
     }
 
     /**
+     * @deprecated since ~0.1, use "Check@setError" instead.
+     *
+     * Sets a custom error message for the last added rule.
+     *
+     * @param string $text
+     *
+     * @return self
+     */
+    public function message($text)
+    {
+        $total = count($this->rules);
+
+        for ($index = $this->index; $index < $total; $index++)
+        {
+            $this->texts[$index] = $text;
+        }
+
+        return $this;
+    }
+
+    /**
      * @return boolean
      */
     public function passed()
@@ -138,6 +169,11 @@ class Valid
 
             $error = $label . ' ' . $rule->getError();
 
+            if (isset($this->texts[$index]))
+            {
+                $error = str_replace('{field}', $label, $this->texts[$index]);
+            }
+
             $this->errors[$field][] = $error;
             // -----------------------------------------
         }
@@ -161,7 +197,7 @@ class Valid
         {
             $text = 'Valla does not support callable rules. ';
 
-            $text .= 'Implement Rougin\Valla\RuleInterface instead.';
+            $text .= 'Implement "Rougin\Valla\RuleInterface" instead.';
 
             throw new \InvalidArgumentException($text);
         }
@@ -180,6 +216,8 @@ class Valid
         {
             $fields = array($fields);
         }
+
+        $this->index = count($this->rules);
 
         foreach ($fields as $field)
         {
